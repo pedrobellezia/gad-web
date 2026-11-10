@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 border-t border-surface-200 space-y-2 mt-auto">
+  <div class="p-4 border-t border-surface-200 dark:border-surface-800 space-y-2 mt-auto">
     <div class="flex items-center gap-3 px-2 py-1">
       <div
         :class="['w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 border',
@@ -15,15 +15,21 @@
       </div>
 
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-surface-800 truncate" :title="userName">
+        <p class="text-sm font-semibold text-surface-800 dark:text-surface-100 truncate leading-tight" :title="userName">
           {{ userName }}
         </p>
+        <span
+          :class="['inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border mt-1',
+            roleBadgeClass]"
+        >
+          {{ roleLabel }}
+        </span>
       </div>
     </div>
 
     <button
       @click="() => logout()"
-      class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-surface-400 hover:text-danger hover:bg-red-50 rounded-lg transition"
+      class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-surface-400 hover:text-danger hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
     >
       <LogOut class="w-4 h-4" />
       <span>Sair da conta</span>
@@ -45,6 +51,36 @@ const userName = computed(() => {
 const userInitials = computed(() => {
   if (!currentUser.value?.name) return 'US'
   return currentUser.value.name.substring(0, 2).toUpperCase()
+})
+
+const roleLabel = computed(() => {
+  switch (currentUser.value?.type) {
+    case 'agency':
+      return 'Agência'
+    case 'client':
+      return 'Cliente'
+    case 'writer':
+      return 'Redator'
+    case 'designer':
+      return 'Designer'
+    default:
+      return 'Usuário'
+  }
+})
+
+const roleBadgeClass = computed(() => {
+  switch (currentUser.value?.type) {
+    case 'agency':
+      return 'bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300 border-brand-200 dark:border-brand-900'
+    case 'client':
+      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'
+    case 'writer':
+      return 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-900'
+    case 'designer':
+      return 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-900'
+    default:
+      return 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-300 border-surface-200'
+  }
 })
 
 const avatarBgClass = computed(() => {
