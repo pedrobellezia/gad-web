@@ -197,6 +197,10 @@ html.dark .bg-white {
   color: #f8fafc;
 }
 
+html.dark aside img[src*="gad.png"] {
+  filter: brightness(1.6) contrast(1.1);
+}
+
 html.dark .bg-surface-50 {
   background-color: #0b1120 !important;
 }

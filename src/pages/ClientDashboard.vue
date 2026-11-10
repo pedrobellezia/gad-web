@@ -2,9 +2,9 @@
   <div class="h-full bg-surface-50 text-surface-800 antialiased flex overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
-      <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center justify-between hover:bg-surface-50 transition">
-        <img src="/logo.png" alt="GAD - Gestor de Agências Digitais" class="h-9 object-contain" />
-        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+      <router-link to="/" class="px-5 py-4.5 border-b border-surface-200 dark:border-surface-800 flex items-center justify-between hover:bg-surface-50 dark:hover:bg-surface-800/40 transition group">
+        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-11 w-auto max-w-[155px] object-contain transition-transform group-hover:scale-102" />
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 shrink-0">
           Cliente
         </span>
       </router-link>
