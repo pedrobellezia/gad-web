@@ -86,12 +86,12 @@
           <h2 class="text-lg font-bold text-surface-800">Lista de Publicações</h2>
           <div class="flex gap-1.5 bg-white border border-surface-200 p-1 rounded-lg text-xs">
             <button
-              v-for="st in ['all', 'draft', 'review', 'approved', 'denied', 'published']"
-              :key="st"
-              @click="setFilter(st)"
-              :class="['px-2.5 py-1 rounded-md capitalize font-medium transition', activeFilter === st ? 'bg-brand-500 text-white' : 'text-surface-500 hover:text-surface-700']"
+              v-for="st in filterOptions"
+              :key="st.value"
+              @click="setFilter(st.value)"
+              :class="['px-2.5 py-1 rounded-md font-medium transition', activeFilter === st.value ? 'bg-brand-500 text-white' : 'text-surface-500 hover:text-surface-700']"
             >
-              {{ st === 'all' ? 'Todos' : st }}
+              {{ st.label }}
             </button>
           </div>
         </div>
@@ -354,6 +354,15 @@ import {
 } from '@lucide/vue'
 
 const currentSection = ref('overview')
+
+const filterOptions = [
+  { value: 'all', label: 'Todos' },
+  { value: 'draft', label: 'Rascunho' },
+  { value: 'review', label: 'Revisão' },
+  { value: 'approved', label: 'Aprovado' },
+  { value: 'denied', label: 'Reprovado' },
+  { value: 'published', label: 'Publicado' }
+]
 
 const { logout } = useAuth()
 const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, updateStatus, updateWriter, deletePost } = usePosts()

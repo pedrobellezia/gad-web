@@ -45,9 +45,10 @@ const badgeText = computed(() => {
     case 'review':
     case 'revisao':
     case 'pending':
-      return 'Em Revisão'
+      return 'Revisão'
     case 'denied':
     case 'rejeitado':
+    case 'reprovado':
       return 'Reprovado'
     case 'draft':
     case 'rascunho':
