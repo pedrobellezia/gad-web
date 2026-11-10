@@ -1,5 +1,6 @@
 <template>
   <button
+    v-if="route.path !== '/'"
     @click="toggleTheme"
     type="button"
     :title="isDark ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
@@ -17,8 +18,10 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { useTheme } from '@/composables/useTheme'
 import { Sun, Moon } from '@lucide/vue'
 
+const route = useRoute()
 const { isDark, toggleTheme } = useTheme()
 </script>
