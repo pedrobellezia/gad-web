@@ -42,11 +42,7 @@
         </button>
       </nav>
 
-      <div class="p-4 border-t border-surface-200">
-        <button @click="logout()" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-400 hover:text-danger rounded-lg transition">
-          <LogOut class="w-4 h-4" />Sair
-        </button>
-      </div>
+      <SidebarUserFooter />
     </aside>
 
     <!-- Main Content -->
@@ -336,6 +332,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
@@ -364,7 +361,7 @@ const filterOptions = [
   { value: 'published', label: 'Publicado' }
 ]
 
-const { logout } = useAuth()
+const { logout, fetchProfile } = useAuth()
 const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, updateStatus, updateWriter, deletePost } = usePosts()
 const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
@@ -373,6 +370,7 @@ const { showToast } = useToast()
 
 onMounted(async () => {
   await Promise.all([
+    fetchProfile().catch(() => {}),
     fetchPosts().catch(() => {}),
     fetchMedias().catch(() => {}),
     fetchTokens().catch(() => {}),

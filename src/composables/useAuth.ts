@@ -8,6 +8,7 @@ import { useToast } from './useToast'
 const token = ref<string | null>(localStorage.getItem('gad_token'))
 const currentUser = ref<User | null>(null)
 const currentProfile = ref<ProfileResponse | null>(null)
+const userAvatarUrl = ref<string>('')
 const isLoading = ref<boolean>(false)
 
 export function useAuth() {
@@ -32,6 +33,17 @@ export function useAuth() {
       currentUser.value = usr
       if (usr) {
         localStorage.setItem('gad_role', usr.type)
+        if (usr.avatar) {
+          try {
+            const blob = await meApi.getAvatarBlob()
+            if (userAvatarUrl.value) URL.revokeObjectURL(userAvatarUrl.value)
+            userAvatarUrl.value = URL.createObjectURL(blob)
+          } catch {
+            userAvatarUrl.value = ''
+          }
+        } else {
+          userAvatarUrl.value = ''
+        }
       }
       return profile
     } catch (err: any) {
@@ -85,6 +97,10 @@ export function useAuth() {
     token.value = null
     currentUser.value = null
     currentProfile.value = null
+    if (userAvatarUrl.value) {
+      URL.revokeObjectURL(userAvatarUrl.value)
+      userAvatarUrl.value = ''
+    }
     localStorage.removeItem('gad_token')
     localStorage.removeItem('gad_role')
     if (showMessage) {
@@ -121,6 +137,7 @@ export function useAuth() {
     token,
     currentUser,
     user: currentUser,
+    userAvatarUrl,
     currentProfile,
     isLoading,
     isAuthenticated,

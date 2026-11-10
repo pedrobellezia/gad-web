@@ -30,11 +30,7 @@
         </button>
       </nav>
 
-      <div class="p-4 border-t border-surface-200">
-        <button @click="logout()" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-surface-400 hover:text-danger rounded-lg transition">
-          <LogOut class="w-4 h-4" />Sair
-        </button>
-      </div>
+      <SidebarUserFooter />
     </aside>
 
     <!-- Main Content -->
@@ -187,6 +183,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
@@ -214,6 +211,7 @@ const tokenInput = ref('')
 
 onMounted(async () => {
   await Promise.all([
+    fetchProfile().catch(() => {}),
     fetchPosts().catch(() => {}),
     fetchMyAgency().catch(() => {})
   ])
