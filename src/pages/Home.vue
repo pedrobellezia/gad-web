@@ -21,7 +21,7 @@
 
     <!-- Features Section -->
     <section class="w-full px-8 py-16 max-w-6xl mx-auto">
-      <h2 class="text-center text-2xl font-bold mb-12 text-surface-700">Por que escolher o Postly?</h2>
+      <h2 class="text-center text-2xl font-bold mb-12 text-surface-800">Por que escolher o GAD?</h2>
       <div class="grid md:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-xl border border-surface-200 card-hover">
           <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center mb-4">

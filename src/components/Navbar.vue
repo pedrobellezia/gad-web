@@ -2,10 +2,7 @@
   <header class="bg-white border-b border-surface-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
     <div class="flex items-center gap-3">
       <router-link to="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center shadow-xs">
-          <PenTool class="w-4 h-4 text-white" />
-        </div>
-        <span class="font-bold text-surface-800 text-lg">GAD</span>
+        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-8 object-contain" />
       </router-link>
       <span v-if="roleBadge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-600 border border-brand-100">
         {{ roleBadge }}

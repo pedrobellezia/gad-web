@@ -2,11 +2,11 @@
   <div class="h-full bg-surface-50 text-surface-800 antialiased flex overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
-      <router-link to="/" class="p-5 border-b border-surface-200 flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center shadow-xs">
-          <PenTool class="w-4 h-4 text-white" />
-        </div>
-        <span class="font-bold text-surface-800">GAD Agência</span>
+      <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center justify-between hover:bg-surface-50 transition">
+        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-8 object-contain" />
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-100">
+          Agência
+        </span>
       </router-link>
 
       <nav class="flex-1 py-4 px-3 space-y-1">
@@ -57,21 +57,44 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white p-5 rounded-xl border border-surface-200 shadow-xs">
-            <span class="text-xs font-semibold text-surface-400 uppercase tracking-wider">Total de Posts</span>
-            <p class="text-2xl font-bold text-surface-800 mt-1">{{ posts.length }}</p>
+          <div class="bg-white p-5 rounded-2xl border border-surface-200 shadow-card hover:shadow-card-hover transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-surface-400 uppercase tracking-wider">Total de Posts</span>
+              <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 border border-brand-100 flex items-center justify-center">
+                <FileText class="w-4 h-4" />
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-surface-800">{{ posts.length }}</p>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-surface-200 shadow-xs">
-            <span class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Em Revisão</span>
-            <p class="text-2xl font-bold text-amber-700 mt-1">{{ countStatus('review') }}</p>
+
+          <div class="bg-white p-5 rounded-2xl border border-surface-200 shadow-card hover:shadow-card-hover transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Em Revisão</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center">
+                <Clock class="w-4 h-4" />
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-amber-700">{{ countStatus('review') }}</p>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-surface-200 shadow-xs">
-            <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Aprovados</span>
-            <p class="text-2xl font-bold text-emerald-700 mt-1">{{ countStatus('approved') }}</p>
+
+          <div class="bg-white p-5 rounded-2xl border border-surface-200 shadow-card hover:shadow-card-hover transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Aprovados</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
+                <CheckCircle2 class="w-4 h-4" />
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-emerald-700">{{ countStatus('approved') }}</p>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-surface-200 shadow-xs">
-            <span class="text-xs font-semibold text-surface-400 uppercase tracking-wider">Membros Vinculados</span>
-            <p class="text-2xl font-bold text-surface-800 mt-1">{{ clients.length + writers.length + designers.length }}</p>
+
+          <div class="bg-white p-5 rounded-2xl border border-surface-200 shadow-card hover:shadow-card-hover transition-all">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Membros</span>
+              <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 border border-purple-200 flex items-center justify-center">
+                <Users class="w-4 h-4" />
+              </div>
+            </div>
+            <p class="text-3xl font-bold text-surface-800">{{ clients.length + writers.length + designers.length }}</p>
           </div>
         </div>
       </div>
@@ -347,7 +370,7 @@ import { getMediaFileUrl } from '@/api/client'
 import type { PostItem, MediaItem } from '@/types/api'
 import {
   PenTool, LayoutDashboard, FileText, Image, Key, Users, LogOut,
-  Plus, Edit, Trash2, Video
+  Plus, Edit, Trash2, Video, Clock, CheckCircle2
 } from '@lucide/vue'
 
 const currentSection = ref('overview')

@@ -1,9 +1,12 @@
 <template>
   <div class="h-full bg-gradient-to-br from-brand-50 to-white flex items-center justify-center p-6 antialiased">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 fade-in border border-surface-200">
-      <router-link to="/" class="flex items-center gap-1 text-sm text-surface-400 hover:text-brand-500 mb-6 transition">
-        <ArrowLeft class="w-4 h-4" /> Voltar ao início
-      </router-link>
+      <div class="flex items-center justify-between mb-6">
+        <router-link to="/" class="flex items-center gap-1 text-sm text-surface-400 hover:text-brand-600 transition">
+          <ArrowLeft class="w-4 h-4" /> Voltar
+        </router-link>
+        <img src="/gad.png" alt="GAD" class="h-7 object-contain" />
+      </div>
       <h2 class="text-2xl font-bold text-surface-800 mb-1">Criar Nova Conta</h2>
       <p class="text-sm text-surface-400 mb-6">Preencha os dados abaixo para se cadastrar</p>
 

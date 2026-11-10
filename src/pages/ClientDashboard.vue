@@ -2,15 +2,12 @@
   <div class="h-full bg-surface-50 text-surface-800 antialiased flex overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
-      <div class="p-5 border-b border-surface-200 flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-xs">
-          <CheckCircle2 class="w-5 h-5" />
-        </div>
-        <div>
-          <span class="font-bold text-surface-800 block text-sm leading-tight">GAD Cliente</span>
-          <span class="text-[11px] text-surface-400">Portal de Aprovação</span>
-        </div>
-      </div>
+      <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center justify-between hover:bg-surface-50 transition">
+        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-8 object-contain" />
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+          Cliente
+        </span>
+      </router-link>
 
       <nav class="flex-1 py-4 px-3 space-y-1">
         <button
