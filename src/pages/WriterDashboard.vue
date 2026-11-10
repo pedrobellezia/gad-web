@@ -161,11 +161,13 @@
             </button>
           </form>
 
-          <div class="pt-6 border-t border-surface-200">
-            <h4 class="text-sm font-bold text-danger mb-1">Zona de Perigo</h4>
-            <p class="text-xs text-surface-400 mb-3">Ao desativar sua conta, seus vínculos serão desfeitos.</p>
-            <button @click="handleDeactivate" class="btn-danger px-4 py-2 rounded-lg text-xs font-semibold">
-              Desativar Minha Conta
+          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
+            <div>
+              <h4 class="text-xs font-medium text-surface-500">Desativação da conta</h4>
+              <p class="text-[11px] text-surface-400">Você perderá o acesso e vínculos com agências até reativar</p>
+            </div>
+            <button @click="handleDeactivate" class="text-xs text-danger hover:underline font-medium">
+              Desativar conta
             </button>
           </div>
         </div>

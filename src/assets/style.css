@@ -176,3 +176,107 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ==========================================================================
+   Dark Mode System
+   ========================================================================== */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0b1120;
+  color: #f1f5f9;
+}
+
+html.dark header,
+html.dark aside,
+html.dark .bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f8fafc;
+}
+
+html.dark .bg-surface-50 {
+  background-color: #0b1120 !important;
+}
+
+html.dark .bg-surface-100 {
+  background-color: #1e293b !important;
+}
+
+html.dark .border-surface-100,
+html.dark .border-surface-200 {
+  border-color: #1e293b !important;
+}
+
+html.dark .border-surface-300 {
+  border-color: #334155 !important;
+}
+
+html.dark .text-surface-900,
+html.dark .text-surface-800,
+html.dark .text-surface-700 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-surface-600,
+html.dark .text-surface-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-surface-400 {
+  color: #64748b !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #8b5cf6 !important;
+}
+
+html.dark .btn-secondary {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .btn-secondary:hover:not(:disabled) {
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+
+html.dark .nav-item {
+  color: #94a3b8;
+}
+
+html.dark .nav-item:hover {
+  background: #1e1b4b !important;
+  color: #c4b5fd !important;
+}
+
+html.dark .nav-item.active {
+  background: #1e1b4b !important;
+  color: #c4b5fd !important;
+  box-shadow: inset 3px 0 0 #8b5cf6;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}

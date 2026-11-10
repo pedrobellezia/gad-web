@@ -235,16 +235,16 @@
             </button>
           </div>
 
-          <div class="pt-6 border-t border-danger/20 flex items-center justify-between">
+          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
             <div>
-              <h4 class="text-sm font-semibold text-danger">Desativar Minha Conta</h4>
-              <p class="text-xs text-surface-400">Você perderá o acesso e os vínculos com agências até reativar</p>
+              <h4 class="text-xs font-medium text-surface-500">Desativação da conta</h4>
+              <p class="text-[11px] text-surface-400">Você perderá o acesso e vínculos com agências até reativar</p>
             </div>
             <button
               @click="handleDeactivateAccount"
-              class="btn-danger px-4 py-2 rounded-lg text-sm font-medium"
+              class="text-xs text-danger hover:underline font-medium"
             >
-              Desativar Conta
+              Desativar conta
             </button>
           </div>
         </div>
