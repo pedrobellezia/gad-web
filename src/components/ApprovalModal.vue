@@ -1,56 +1,77 @@
 <template>
-  <div v-if="approvalModalOpen" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+  <div v-if="approvalModalOpen && selectedPostForApproval" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl p-6 w-full max-w-md fade-in shadow-2xl border border-surface-200">
-      <h3 class="text-lg font-semibold text-surface-800 mb-2">{{ modalTitle }}</h3>
-      <p class="text-sm text-surface-400 mb-4">Comentário descritivo é obrigatório para esta ação (RN13)</p>
-      
-      <label for="modal-comment" class="block text-sm font-medium text-surface-600 mb-1">Seu comentário</label>
-      <textarea
-        id="modal-comment"
-        v-model="comment"
-        rows="3"
-        required
-        class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm mb-4"
-        placeholder="Descreva os detalhes ou motivos..."
-      ></textarea>
-      
+      <h3 class="text-lg font-semibold text-surface-800 mb-2">
+        {{ currentApprovalAction === 'approve' ? 'Aprovar Publicação' : 'Reprovar Publicação' }}
+      </h3>
+      <p class="text-sm text-surface-500 mb-4">
+        Post: <strong>{{ selectedPostForApproval.title }}</strong>
+      </p>
+
+      <div>
+        <label for="approval-comment" class="block text-sm font-medium text-surface-600 mb-1">
+          Comentário {{ currentApprovalAction === 'deny' ? '(Obrigatório para justificar a recusa)' : '(Opcional)' }}
+        </label>
+        <textarea
+          id="approval-comment"
+          v-model="comment"
+          rows="3"
+          :placeholder="currentApprovalAction === 'deny' ? 'Explique o motivo da reprovação...' : 'Adicione observações para o redator...'"
+          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm mb-4"
+        ></textarea>
+      </div>
+
       <div class="flex gap-2 justify-end">
-        <button @click="closeApprovalModal" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">Cancelar</button>
-        <button @click="submitApproval" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Confirmar</button>
+        <button type="button" @click="closeApprovalModal" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          @click="submitApproval"
+          :disabled="isLoading"
+          :class="['px-4 py-2 rounded-lg text-sm font-medium text-white disabled:opacity-50', currentApprovalAction === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700']"
+        >
+          {{ isLoading ? 'Processando...' : currentApprovalAction === 'approve' ? 'Confirmar Aprovação' : 'Confirmar Reprovação' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useModals } from '@/composables/useModals'
+import { usePosts } from '@/composables/usePosts'
 import { useToast } from '@/composables/useToast'
 
-const { approvalModalOpen, currentApprovalAction, closeApprovalModal } = useModals()
+const { approvalModalOpen, selectedPostForApproval, currentApprovalAction, closeApprovalModal } = useModals()
+const { updateStatus, addComment } = usePosts()
 const { showToast } = useToast()
 
 const comment = ref('')
+const isLoading = ref(false)
 
-const modalTitle = computed(() => {
-  const titles: Record<string, string> = { approve: 'Aprovar Post', reject: 'Rejeitar Post', change: 'Solicitar Alteração' }
-  return titles[currentApprovalAction.value] || 'Ação no Post'
-})
+async function submitApproval() {
+  if (!selectedPostForApproval.value) return
 
-function submitApproval() {
-  if (!comment.value.trim()) {
-    showToast('Comentário é obrigatório (RN13)!', 'error')
+  if (currentApprovalAction.value === 'deny' && !comment.value.trim()) {
+    showToast('Justificativa é obrigatória para reprovar o post!', 'error')
     return
   }
 
-  const msgs: Record<string, string> = {
-    approve: 'Post aprovado com sucesso!',
-    reject: 'Post rejeitado.',
-    change: 'Solicitação de alteração enviada para o redator.'
-  }
+  isLoading.value = true
+  try {
+    const nextStatus = currentApprovalAction.value === 'approve' ? 'approved' : 'denied'
+    await updateStatus(selectedPostForApproval.value.id, nextStatus, selectedPostForApproval.value.version)
 
-  showToast(msgs[currentApprovalAction.value] || 'Ação registrada!', currentApprovalAction.value === 'approve' ? 'success' : 'info')
-  closeApprovalModal()
-  comment.value = ''
+    if (comment.value.trim()) {
+      await addComment(selectedPostForApproval.value.id, comment.value.trim())
+    }
+
+    closeApprovalModal()
+    comment.value = ''
+  } catch {} finally {
+    isLoading.value = false
+  }
 }
 </script>
