@@ -1,9 +1,8 @@
 <template>
   <header class="bg-white border-b border-surface-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
     <div class="flex items-center gap-3">
-      <router-link to="/" class="flex items-center gap-2.5 group">
-        <img src="/favicon.png" alt="GAD" class="h-8 w-8 object-contain transition-transform group-hover:scale-105" />
-        <span class="font-extrabold text-surface-900 text-lg tracking-tight">GAD</span>
+      <router-link to="/" class="flex items-center gap-2 group">
+        <span class="font-extrabold text-brand-600 dark:text-brand-400 text-2xl tracking-tight">GAD</span>
       </router-link>
       <span v-if="roleBadge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-600 border border-brand-100">
         {{ roleBadge }}
