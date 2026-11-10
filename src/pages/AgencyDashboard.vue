@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
       <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center justify-between hover:bg-surface-50 transition">
-        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-8 object-contain" />
+        <img src="/logo.png" alt="GAD - Gestor de Agências Digitais" class="h-9 object-contain" />
         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-100">
           Agência
         </span>
