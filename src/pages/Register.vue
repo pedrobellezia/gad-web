@@ -8,27 +8,7 @@
       <p class="text-sm text-surface-400 mb-6">Preencha os dados abaixo para se cadastrar</p>
 
       <form @submit.prevent="handleRegister">
-        <label for="reg-name" class="block text-sm font-medium text-surface-600 mb-1">Nome completo / Razão Social</label>
-        <input
-          v-model="name"
-          id="reg-name"
-          type="text"
-          required
-          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-4 text-sm"
-          placeholder="Ex: Agência Digital XYZ ou Seu Nome"
-        />
-
-        <label for="reg-email" class="block text-sm font-medium text-surface-600 mb-1">E-mail</label>
-        <input
-          v-model="email"
-          id="reg-email"
-          type="email"
-          required
-          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-4 text-sm"
-          placeholder="seu@email.com"
-        />
-
-        <label for="reg-role" class="block text-sm font-medium text-surface-600 mb-1">Tipo de perfil</label>
+        <label for="reg-role" class="block text-sm font-medium text-surface-600 mb-1">Tipo de perfil <span class="text-danger">*</span></label>
         <select
           v-model="role"
           id="reg-role"
@@ -43,7 +23,7 @@
         </select>
 
         <div v-if="role === 'agency'" id="cnpj-field">
-          <label for="reg-cnpj" class="block text-sm font-medium text-surface-600 mb-1">CNPJ <span class="text-danger">*</span></label>
+          <label for="reg-cnpj" class="block text-sm font-medium text-surface-600 mb-1">CNPJ da Agência <span class="text-danger">*</span></label>
           <input
             v-model="cnpj"
             id="reg-cnpj"
@@ -53,6 +33,28 @@
             placeholder="00.000.000/0000-00 ou 14 dígitos"
           />
         </div>
+
+        <label for="reg-name" class="block text-sm font-medium text-surface-600 mb-1">
+          {{ role === 'agency' ? 'Razão Social / Nome da Agência' : role === 'client' ? 'Nome da Empresa / Cliente' : 'Nome completo' }}
+        </label>
+        <input
+          v-model="name"
+          id="reg-name"
+          type="text"
+          required
+          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-4 text-sm"
+          :placeholder="role === 'agency' ? 'Ex: Agência Criativa Ltda' : 'Seu nome completo'"
+        />
+
+        <label for="reg-email" class="block text-sm font-medium text-surface-600 mb-1">E-mail</label>
+        <input
+          v-model="email"
+          id="reg-email"
+          type="email"
+          required
+          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-4 text-sm"
+          placeholder="seu@email.com"
+        />
 
         <label for="reg-pass" class="block text-sm font-medium text-surface-600 mb-1">Senha</label>
         <input
