@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.gadagencia.com.br:8000'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.gadagencia.com.br'
 
 export interface ApiRequestOptions extends RequestInit {
   params?: Record<string, any>
