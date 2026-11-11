@@ -210,13 +210,26 @@ function moveMedia(index: number, direction: -1 | 1) {
 async function handleSubmit() {
   if (!selectedPostForEdit.value) return
   try {
-    await updatePost(selectedPostForEdit.value.id, {
+    const payload: {
+      title: string
+      content: string
+      version: number
+      medias: { media_id: string; position: number }[]
+      client_id?: string | null
+    } = {
       title: form.title,
       content: form.content,
-      client_id: form.client_id,
       medias: selectedMedias.value,
       version: selectedPostForEdit.value.version
-    })
+    }
+
+    // Apenas a agência tem permissão para alterar/enviar o destinatário (client_id).
+    // Se outro papel enviar a chave no JSON, a API bloqueia com 403 Forbidden.
+    if (canEditClient.value) {
+      payload.client_id = form.client_id
+    }
+
+    await updatePost(selectedPostForEdit.value.id, payload)
     closeEditPostModal()
   } catch {}
 }

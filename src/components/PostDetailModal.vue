@@ -107,17 +107,23 @@
               :key="cmt.id"
               class="p-4 bg-surface-50 rounded-xl border border-surface-200 flex items-start justify-between gap-3"
             >
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-semibold text-surface-700">Autor #{{ cmt.author_id.slice(0, 8) }}</span>
-                  <span class="text-[11px] text-surface-400">{{ formatDate(cmt.created_at) }}</span>
+              <div class="flex items-start gap-3 flex-1 min-w-0">
+                <!-- Avatar / Iniciais do autor -->
+                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                  {{ getCommentAuthorInitials(cmt) }}
                 </div>
-                <p class="text-sm text-surface-700 leading-relaxed">{{ cmt.content }}</p>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 mb-1 flex-wrap">
+                    <span class="text-xs font-semibold text-surface-800">{{ getCommentAuthorName(cmt) }}</span>
+                    <span class="text-[11px] text-surface-400">{{ formatDate(cmt.created_at) }}</span>
+                  </div>
+                  <p class="text-sm text-surface-700 leading-relaxed whitespace-pre-wrap break-words">{{ cmt.content }}</p>
+                </div>
               </div>
               <button
                 v-if="canDeleteComment(cmt)"
                 @click="handleDeleteComment(cmt.id)"
-                class="text-surface-400 hover:text-danger p-1 rounded transition"
+                class="text-surface-400 hover:text-danger p-1 rounded transition shrink-0"
                 title="Excluir comentário"
               >
                 <Trash2 class="w-4 h-4" />
@@ -150,6 +156,7 @@ import { ref, watch } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
+import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { getMediaFileUrl } from '@/api/client'
 import StatusBadge from './StatusBadge.vue'
 import AuditTimeline from './AuditTimeline.vue'
@@ -159,6 +166,7 @@ import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucid
 const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal } = useModals()
 const { comments, fetchComments, addComment, removeComment } = usePosts()
 const { currentUser } = useAuth()
+const { clients, writers } = useAgencyMembers()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')
@@ -201,5 +209,50 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function getCommentAuthorName(cmt: CommentItem): string {
+  // 1. Se a API já enviar o objeto author ou author_name
+  if (cmt.author?.name) return cmt.author.name
+  if (cmt.author_name) return cmt.author_name
+
+  // 2. Se for o próprio usuário atualmente logado
+  if (currentUser.value && currentUser.value.id === cmt.author_id) {
+    return `${currentUser.value.name} (Você)`
+  }
+
+  // 3. Checar lista de membros da agência (clientes e redatores já conhecidos)
+  const clientMatch = clients.value.find(c => c.user.id === cmt.author_id)
+  if (clientMatch) return clientMatch.user.name
+
+  const writerMatch = writers.value.find(w => w.user.id === cmt.author_id)
+  if (writerMatch) return writerMatch.user.name
+
+  // 4. Se coincidir com o cliente ou redator associado ao post
+  if (selectedPostForDetail.value) {
+    if (selectedPostForDetail.value.client_id === cmt.author_id) {
+      return 'Cliente'
+    }
+    if (selectedPostForDetail.value.writer_id === cmt.author_id) {
+      return 'Redator'
+    }
+    if (selectedPostForDetail.value.agency_id === cmt.author_id) {
+      return 'Agência'
+    }
+  }
+
+  // 5. Fallback com o id encurtado
+  return `Autor #${cmt.author_id.slice(0, 8)}`
+}
+
+function getCommentAuthorInitials(cmt: CommentItem): string {
+  const name = getCommentAuthorName(cmt)
+  if (!name || name.startsWith('Autor #')) return 'U'
+  const clean = name.replace('(Você)', '').trim()
+  const parts = clean.split(' ').filter(Boolean)
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  }
+  return clean.slice(0, 2).toUpperCase()
 }
 </script>

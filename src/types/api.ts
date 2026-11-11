@@ -60,6 +60,8 @@ export interface CommentItem {
   author_id: string
   content: string
   created_at: string
+  author?: User | null
+  author_name?: string | null
 }
 
 export type PostStatus = 'draft' | 'review' | 'approved' | 'denied' | 'published'
