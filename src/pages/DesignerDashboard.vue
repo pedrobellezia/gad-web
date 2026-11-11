@@ -194,6 +194,8 @@
         </div>
 
         <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+          <AvatarUpload />
+
           <div class="space-y-4">
             <div>
               <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">Nome Completo</label>
@@ -274,6 +276,7 @@ import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaImage from '@/components/MediaImage.vue'
+import AvatarUpload from '@/components/AvatarUpload.vue'
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
   Palette,

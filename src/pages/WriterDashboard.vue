@@ -154,6 +154,8 @@
       <div v-if="currentSection === 'profile'" class="fade-in max-w-xl">
         <h2 class="text-2xl font-bold text-surface-800 mb-6">Meu Perfil</h2>
         <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+          <AvatarUpload />
+
           <form @submit.prevent="handleUpdateProfile" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-surface-600 mb-1">Nome Completo</label>
@@ -193,6 +195,7 @@
 import { ref, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
+import AvatarUpload from '@/components/AvatarUpload.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'

@@ -243,6 +243,8 @@
         </div>
 
         <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+          <AvatarUpload />
+
           <div class="space-y-4">
             <div>
               <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">Nome da Empresa / Cliente</label>
@@ -320,6 +322,7 @@ import { meApi } from '@/api/me'
 import type { Agency } from '@/types/api'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
+import AvatarUpload from '@/components/AvatarUpload.vue'
 import ApprovalModal from '@/components/ApprovalModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
