@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
       <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center hover:bg-surface-50 transition group">
-        <img src="/gad.png" alt="GAD - Gestor de Agências Digitais" class="h-10 w-auto max-w-[180px] object-contain transition-transform group-hover:scale-102" />
+        <span class="font-extrabold text-brand-600 text-2xl tracking-tight">GAD</span>
       </router-link>
 
       <nav class="flex-1 py-4 px-3 space-y-1">

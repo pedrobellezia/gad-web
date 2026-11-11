@@ -22,7 +22,7 @@
             Começar Gratuitamente
           </router-link>
           <router-link to="/login" class="w-full sm:w-auto btn-secondary px-8 py-3.5 rounded-xl text-sm font-semibold">
-            Acessar Demonstração
+            Já tenho uma conta
           </router-link>
         </div>
       </div>
