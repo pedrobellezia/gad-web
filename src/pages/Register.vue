@@ -65,9 +65,25 @@
           id="reg-pass"
           type="password"
           required
-          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-6 text-sm"
+          class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none mb-4 text-sm"
           placeholder="Mínimo 8 caracteres"
         />
+
+        <div class="flex items-start gap-2.5 mb-6">
+          <input
+            v-model="termsAccepted"
+            id="reg-terms"
+            type="checkbox"
+            required
+            class="mt-0.5 h-4 w-4 rounded border-surface-300 text-brand-600 focus:ring-brand-500 cursor-pointer shrink-0"
+          />
+          <label for="reg-terms" class="text-xs text-surface-600 leading-relaxed cursor-pointer select-none">
+            Li e concordo com os
+            <router-link to="/terms" target="_blank" class="text-brand-600 hover:underline font-semibold">Termos de Uso</router-link>
+            e com a
+            <router-link to="/privacy" target="_blank" class="text-brand-600 hover:underline font-semibold">Política de Privacidade</router-link>.
+          </label>
+        </div>
 
         <button type="submit" :disabled="isLoading" class="w-full btn-primary py-3 rounded-lg font-semibold disabled:opacity-50">
           {{ isLoading ? 'Cadastrando...' : 'Cadastrar Minha Conta' }}
@@ -98,8 +114,14 @@ const email = ref('')
 const role = ref<'agency' | 'client' | 'writer' | 'designer' | ''>('')
 const cnpj = ref('')
 const password = ref('')
+const termsAccepted = ref(false)
 
 async function handleRegister() {
+  if (!termsAccepted.value) {
+    showToast('Você deve aceitar os Termos de Uso e a Política de Privacidade para continuar!', 'error')
+    return
+  }
+
   if (!role.value) {
     showToast('Selecione o tipo de perfil!', 'error')
     return

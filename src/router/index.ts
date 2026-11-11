@@ -3,6 +3,8 @@ import Home from '@/pages/Home.vue'
 import Login from '@/pages/Login.vue'
 import Register from '@/pages/Register.vue'
 import Recovery from '@/pages/Recovery.vue'
+import Terms from '@/pages/Terms.vue'
+import Privacy from '@/pages/Privacy.vue'
 import AgencyDashboard from '@/pages/AgencyDashboard.vue'
 import ClientDashboard from '@/pages/ClientDashboard.vue'
 import WriterDashboard from '@/pages/WriterDashboard.vue'
@@ -13,6 +15,8 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
   { path: '/recovery', name: 'Recovery', component: Recovery },
+  { path: '/terms', name: 'Terms', component: Terms },
+  { path: '/privacy', name: 'Privacy', component: Privacy },
   {
     path: '/dashboard-agency',
     name: 'AgencyDashboard',

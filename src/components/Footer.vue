@@ -9,11 +9,12 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-6 text-xs text-surface-400">
+      <div class="flex flex-wrap items-center justify-center sm:justify-end gap-x-6 gap-y-2 text-xs text-surface-400">
         <router-link to="/login" class="hover:text-white transition">Entrar</router-link>
         <router-link to="/register" class="hover:text-white transition">Cadastrar</router-link>
-        <span class="text-surface-700">•</span>
-        <span class="text-surface-500">Em conformidade com a LGPD</span>
+        <span class="text-surface-700 hidden sm:inline">•</span>
+        <router-link to="/terms" class="hover:text-white transition">Termos de Uso</router-link>
+        <router-link to="/privacy" class="hover:text-white transition">Privacidade (LGPD)</router-link>
       </div>
     </div>
 
