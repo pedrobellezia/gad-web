@@ -86,10 +86,15 @@
           >
             <!-- Media Thumbnail Placeholder / Header -->
             <div class="h-40 bg-surface-100 flex items-center justify-center relative overflow-hidden">
-              <span class="text-xs font-mono uppercase px-2 py-1 bg-surface-900/60 text-white rounded-md backdrop-blur-xs">
+              <MediaImage
+                v-if="media.mime_type.startsWith('image/')"
+                :media-id="media.id"
+                :alt="media.alias"
+              />
+              <span v-else class="text-xs font-mono uppercase px-2 py-1 bg-surface-900/60 text-white rounded-md backdrop-blur-xs">
                 {{ media.mime_type.split('/')[1] }}
               </span>
-              <span class="absolute top-2 right-2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded backdrop-blur-xs">
+              <span class="absolute top-2 right-2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
                 {{ (media.size_bytes / 1024).toFixed(0) }} KB
               </span>
             </div>
@@ -268,6 +273,7 @@ import type { Agency } from '@/types/api'
 import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
+import MediaImage from '@/components/MediaImage.vue'
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
   Palette,

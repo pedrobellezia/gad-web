@@ -115,13 +115,14 @@
 import { ref, watch } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { useMedia } from '@/composables/useMedia'
+import { useMediaCache } from '@/composables/useMediaCache'
 import { useToast } from '@/composables/useToast'
-import { mediaApi } from '@/api/media'
 import AuditTimeline from '@/components/AuditTimeline.vue'
 import { X, Image, History, Trash2 } from '@lucide/vue'
 
 const { mediaDetailModalOpen, selectedMediaForDetail, closeMediaDetailModal } = useModals()
 const { updateAlias, deleteMedia } = useMedia()
+const { loadMedia, getMediaUrl } = useMediaCache()
 const { showToast } = useToast()
 
 const activeTab = ref<'info' | 'audit'>('info')
@@ -131,20 +132,21 @@ const isUpdating = ref<boolean>(false)
 const isDeleting = ref<boolean>(false)
 
 watch(() => selectedMediaForDetail.value, async (media) => {
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value)
-    previewUrl.value = ''
-  }
-
   if (media) {
     activeTab.value = 'info'
     newAlias.value = media.alias
-    try {
-      const blob = await mediaApi.getFileBlob(media.id)
-      previewUrl.value = URL.createObjectURL(blob)
-    } catch {
-      previewUrl.value = ''
+    const cached = getMediaUrl(media.id)
+    if (cached) {
+      previewUrl.value = cached
+    } else {
+      try {
+        previewUrl.value = await loadMedia(media.id)
+      } catch {
+        previewUrl.value = ''
+      }
     }
+  } else {
+    previewUrl.value = ''
   }
 }, { immediate: true })
 

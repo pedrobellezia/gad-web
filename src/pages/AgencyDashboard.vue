@@ -199,11 +199,10 @@
             class="bg-white rounded-xl border border-surface-200 overflow-hidden flex flex-col shadow-xs"
           >
             <div class="h-36 bg-surface-100 flex items-center justify-center overflow-hidden relative">
-              <img
+              <MediaImage
                 v-if="m.media_type === 'image'"
-                :src="getMediaFileUrl(m.id)"
+                :media-id="m.id"
                 :alt="m.alias"
-                class="w-full h-full object-cover"
               />
               <div v-else class="flex flex-col items-center justify-center text-surface-500">
                 <Video class="w-8 h-8 mb-1" />
@@ -363,7 +362,7 @@ import { useMedia } from '@/composables/useMedia'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
-import { getMediaFileUrl } from '@/api/client'
+import MediaImage from '@/components/MediaImage.vue'
 import type { PostItem, MediaItem } from '@/types/api'
 import {
   PenTool, LayoutDashboard, FileText, Image, Key, Users, LogOut,

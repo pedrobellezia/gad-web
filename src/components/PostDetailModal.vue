@@ -62,11 +62,10 @@
                   Posição #{{ pm.position }}
                 </div>
                 <div class="h-36 bg-surface-200 flex items-center justify-center overflow-hidden">
-                  <img
+                  <MediaImage
                     v-if="pm.media.media_type === 'image'"
-                    :src="getMediaFileUrl(pm.media.id)"
+                    :media-id="pm.media.id"
                     :alt="pm.media.alias"
-                    class="w-full h-full object-cover"
                   />
                   <div v-else class="flex flex-col items-center justify-center text-surface-500">
                     <Video class="w-8 h-8 mb-1" />
@@ -157,9 +156,9 @@ import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
-import { getMediaFileUrl } from '@/api/client'
 import StatusBadge from './StatusBadge.vue'
 import AuditTimeline from './AuditTimeline.vue'
+import MediaImage from './MediaImage.vue'
 import type { CommentItem } from '@/types/api'
 import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucide/vue'
 
