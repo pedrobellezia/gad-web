@@ -5,7 +5,7 @@
         <router-link to="/" class="flex items-center gap-1 text-sm text-surface-400 hover:text-brand-600 transition">
           <ArrowLeft class="w-4 h-4" /> Voltar
         </router-link>
-        <img src="/logo.png" alt="GAD" class="h-8 object-contain" />
+        <img src="/favicon.png" alt="GAD" class="h-8 w-8 object-contain" />
       </div>
       <h2 class="text-2xl font-bold text-surface-800 mb-1">Criar Nova Conta</h2>
       <p class="text-sm text-surface-400 mb-6">Preencha os dados abaixo para se cadastrar</p>
