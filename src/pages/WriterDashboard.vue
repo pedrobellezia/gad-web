@@ -77,9 +77,19 @@
               <button
                 v-if="post.status === 'draft'"
                 @click="sendToReview(post)"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
               >
                 Enviar p/ Revisão
+              </button>
+
+              <!-- Publish post if approved -->
+              <button
+                v-if="post.status === 'approved'"
+                @click="publishPost(post)"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition"
+              >
+                <CheckCircle2 class="w-3.5 h-3.5" />
+                Publicar
               </button>
 
               <button
@@ -194,7 +204,7 @@ import { useModals } from '@/composables/useModals'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem } from '@/types/api'
-import { PenTool, FileText, Building, User, LogOut, Plus, Edit, Trash2 } from '@lucide/vue'
+import { PenTool, FileText, Building, User, LogOut, Plus, Edit, Trash2, CheckCircle2 } from '@lucide/vue'
 
 const currentSection = ref('posts')
 
@@ -226,6 +236,14 @@ async function sendToReview(post: PostItem) {
     return
   }
   await updateStatus(post.id, 'review', post.version)
+}
+
+async function publishPost(post: PostItem) {
+  if (!confirm(`Deseja realmente marcar o post "${post.title}" como publicado?`)) return
+  try {
+    await updateStatus(post.id, 'published', post.version)
+    showToast('Post publicado com sucesso!', 'success')
+  } catch {}
 }
 
 async function handleDelete(postId: string) {
