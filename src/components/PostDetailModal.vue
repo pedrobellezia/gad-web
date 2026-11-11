@@ -108,8 +108,16 @@
             >
               <div class="flex items-start gap-3 flex-1 min-w-0">
                 <!-- Avatar / Iniciais do autor -->
-                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                  {{ getCommentAuthorInitials(cmt) }}
+                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-xs shrink-0 select-none overflow-hidden border border-surface-200">
+                  <img
+                    v-if="getCommentAuthorAvatar(cmt)"
+                    :src="getCommentAuthorAvatar(cmt)!"
+                    :alt="getCommentAuthorName(cmt)"
+                    class="w-full h-full object-cover"
+                  />
+                  <span v-else>
+                    {{ getCommentAuthorInitials(cmt) }}
+                  </span>
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 mb-1 flex-wrap">
@@ -164,7 +172,7 @@ import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucid
 
 const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal } = useModals()
 const { comments, fetchComments, addComment, removeComment } = usePosts()
-const { currentUser } = useAuth()
+const { currentUser, userAvatarUrl } = useAuth()
 const { clients, writers } = useAgencyMembers()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
@@ -253,5 +261,19 @@ function getCommentAuthorInitials(cmt: CommentItem): string {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
   }
   return clean.slice(0, 2).toUpperCase()
+}
+
+function getCommentAuthorAvatar(cmt: CommentItem): string | null {
+  // 1. Se for o próprio usuário atualmente autenticado
+  if (currentUser.value && currentUser.value.id === cmt.author_id && userAvatarUrl.value) {
+    return userAvatarUrl.value
+  }
+
+  // 2. Se a API tiver retornado o campo avatar no autor
+  if (cmt.author?.avatar) {
+    return cmt.author.avatar
+  }
+
+  return null
 }
 </script>
