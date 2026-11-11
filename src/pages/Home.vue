@@ -5,10 +5,6 @@
     <!-- Hero Section -->
     <section class="w-full px-6 py-20 md:py-28 text-center bg-gradient-to-b from-brand-50/70 via-white to-surface-50 border-b border-surface-200/80">
       <div class="max-w-4xl mx-auto fade-in">
-        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-brand-100 text-brand-700 border border-brand-200 mb-6">
-          Plataforma Completa
-        </span>
-
         <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-surface-900 tracking-tight leading-tight mb-6">
           GAD - Gestão de Agência <span class="text-brand-600">Digital</span>
         </h1>
