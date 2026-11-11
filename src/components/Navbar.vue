@@ -2,11 +2,8 @@
   <header class="bg-white border-b border-surface-200 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
     <div class="flex items-center gap-3">
       <router-link to="/" class="flex items-center gap-2 group">
-        <span class="font-extrabold text-brand-600 dark:text-brand-400 text-2xl tracking-tight">GAD</span>
+        <span class="font-extrabold text-brand-600 text-2xl tracking-tight">GAD</span>
       </router-link>
-      <span v-if="roleBadge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-600 border border-brand-100">
-        {{ roleBadge }}
-      </span>
     </div>
 
     <!-- Right user controls -->
@@ -26,13 +23,21 @@
       </button>
 
       <div class="flex items-center gap-2.5 pl-2 border-l border-surface-200">
-        <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold overflow-hidden border border-brand-200">
-          <img v-if="currentUser.avatar" :src="avatarUrl" :alt="currentUser.name" class="w-full h-full object-cover" />
+        <div
+          :class="['w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden border shrink-0',
+            avatarBgClass]"
+        >
+          <img v-if="userAvatarUrl" :src="userAvatarUrl" :alt="currentUser.name" class="w-full h-full object-cover" />
           <span v-else>{{ initials }}</span>
         </div>
         <div class="hidden sm:block text-left">
-          <p class="text-xs font-semibold text-surface-700 leading-tight">{{ currentUser.name }}</p>
-          <p class="text-[11px] text-surface-400 leading-tight">{{ currentUser.email }}</p>
+          <p class="text-xs font-semibold text-surface-800 leading-tight">{{ currentUser.name }}</p>
+          <span
+            :class="['inline-block text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border mt-0.5',
+              roleBadgeClass]"
+          >
+            {{ roleBadge }}
+          </span>
         </div>
       </div>
 
@@ -56,13 +61,10 @@
 import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useModals } from '@/composables/useModals'
-import { PenTool, Key, LogOut } from '@lucide/vue'
+import { Key, LogOut } from '@lucide/vue'
 
-const { currentUser, logout } = useAuth()
+const { currentUser, userAvatarUrl, logout } = useAuth()
 const { openChangePasswordModal } = useModals()
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://api.gadagencia.com.br:8000'
-const avatarUrl = computed(() => currentUser.value?.avatar ? `${BASE_URL}/me/avatar` : '')
 
 const roleBadge = computed(() => {
   if (!currentUser.value) return ''
@@ -72,6 +74,36 @@ const roleBadge = computed(() => {
     case 'writer': return 'Redator'
     case 'designer': return 'Designer'
     default: return ''
+  }
+})
+
+const roleBadgeClass = computed(() => {
+  switch (currentUser.value?.type) {
+    case 'agency':
+      return 'bg-brand-50 text-brand-700 border-brand-200'
+    case 'client':
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200'
+    case 'writer':
+      return 'bg-amber-50 text-amber-700 border-amber-200'
+    case 'designer':
+      return 'bg-purple-50 text-purple-700 border-purple-200'
+    default:
+      return 'bg-surface-100 text-surface-600 border-surface-200'
+  }
+})
+
+const avatarBgClass = computed(() => {
+  switch (currentUser.value?.type) {
+    case 'agency':
+      return 'bg-brand-100 text-brand-700 border-brand-200'
+    case 'client':
+      return 'bg-emerald-100 text-emerald-700 border-emerald-200'
+    case 'writer':
+      return 'bg-amber-100 text-amber-700 border-amber-200'
+    case 'designer':
+      return 'bg-purple-100 text-purple-700 border-purple-200'
+    default:
+      return 'bg-surface-100 text-surface-700 border-surface-200'
   }
 })
 
