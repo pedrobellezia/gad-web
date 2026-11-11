@@ -142,21 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
 import { Users, CheckCircle, Sparkles, Check } from '@lucide/vue'
-
-onMounted(() => {
-  // Garante que a Home permaneça estritamente no Light Mode
-  document.documentElement.classList.remove('dark')
-})
-
-onUnmounted(() => {
-  // Restaura o dark mode se o usuário o tiver ativado para os dashboards
-  const saved = localStorage.getItem('gad_theme')
-  if (saved === 'dark') {
-    document.documentElement.classList.add('dark')
-  }
-})
 </script>

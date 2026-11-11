@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 border-t border-surface-200 dark:border-surface-800 space-y-2 mt-auto">
+  <div class="p-4 border-t border-surface-200 space-y-2 mt-auto">
     <div class="flex items-center gap-3 px-2 py-1">
       <div
         :class="['w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 border',
@@ -15,7 +15,7 @@
       </div>
 
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-surface-800 dark:text-surface-100 truncate leading-tight" :title="userName">
+        <p class="text-sm font-semibold text-surface-800 truncate leading-tight" :title="userName">
           {{ userName }}
         </p>
         <span
@@ -29,7 +29,7 @@
 
     <button
       @click="() => logout()"
-      class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-surface-400 hover:text-danger hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
+      class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-surface-400 hover:text-danger hover:bg-red-50 rounded-lg transition"
     >
       <LogOut class="w-4 h-4" />
       <span>Sair da conta</span>
@@ -71,15 +71,15 @@ const roleLabel = computed(() => {
 const roleBadgeClass = computed(() => {
   switch (currentUser.value?.type) {
     case 'agency':
-      return 'bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300 border-brand-200 dark:border-brand-900'
+      return 'bg-brand-50 text-brand-700 border-brand-200'
     case 'client':
-      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200'
     case 'writer':
-      return 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-900'
+      return 'bg-amber-50 text-amber-700 border-amber-200'
     case 'designer':
-      return 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-900'
+      return 'bg-purple-50 text-purple-700 border-purple-200'
     default:
-      return 'bg-surface-100 text-surface-600 dark:bg-surface-800 dark:text-surface-300 border-surface-200'
+      return 'bg-surface-100 text-surface-600 border-surface-200'
   }
 })
 
