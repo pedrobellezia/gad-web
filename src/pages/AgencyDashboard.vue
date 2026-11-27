@@ -142,6 +142,8 @@
               </div>
               <p class="text-xs text-surface-600 dark:text-surface-300 line-clamp-1 mb-2">{{ post.content }}</p>
               <div class="flex items-center gap-4 text-xs text-surface-500 dark:text-surface-400">
+                <span>Cliente: {{ memberName(clients, post.client_id) }}</span>
+                <span>Redator: {{ memberName(writers, post.writer_id) }}</span>
                 <span>{{ post.medias.length }} mídia(s)</span>
                 <span>{{ post.comments.length }} comentário(s)</span>
                 <span>Atualizado em {{ formatDate(post.updated_at) }}</span>
@@ -152,7 +154,7 @@
             <div class="flex items-center gap-2 shrink-0 ml-4">
               <button
                 v-if="post.status !== 'denied' && post.status !== 'published'"
-                @click="promptChangeWriter(post)"
+                @click="openAssignWriter(post)"
                 class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium"
                 title="Trocar Redator"
               >
@@ -224,6 +226,7 @@
               <div>
                 <p class="text-xs font-semibold text-surface-800 dark:text-surface-100 truncate" :title="m.alias">{{ m.alias }}</p>
                 <p class="text-[11px] text-surface-500 dark:text-surface-400 font-mono">{{ (m.size_bytes / 1024).toFixed(1) }} KB</p>
+                <p class="text-[11px] text-surface-500 dark:text-surface-400 truncate">Designer: {{ memberName(designers, m.designer_id) }}</p>
               </div>
 
               <div class="flex items-center justify-between pt-2 border-t border-surface-200/80 dark:border-surface-700/80 mt-2">
@@ -234,7 +237,7 @@
                   Renomear
                 </button>
                 <button
-                  @click="promptAssignDesigner(m)"
+                  @click="openAssignDesigner(m)"
                   class="text-[11px] text-surface-600 dark:text-surface-300 hover:underline"
                 >
                   Designer
@@ -354,16 +357,28 @@
     <CreatePostModal />
     <EditPostModal />
     <PostDetailModal />
+    <AssignMemberModal
+      :open="assign.open"
+      :title="assign.title"
+      :label="assign.label"
+      :empty-label="assign.emptyLabel"
+      :no-options-hint="assign.noOptionsHint"
+      :options="assign.options"
+      :current-id="assign.currentId"
+      :on-confirm="assign.onConfirm"
+      @close="assign.open = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
+import AssignMemberModal, { type MemberOption } from '@/components/AssignMemberModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useMedia } from '@/composables/useMedia'
@@ -416,11 +431,39 @@ async function publishPost(post: PostItem) {
   await updateStatus(post.id, 'published', post.version)
 }
 
-async function promptChangeWriter(post: PostItem) {
-  const options = writers.value.map(w => `${w.user.id}: ${w.user.name}`).join('\n')
-  const newWriterId = prompt(`Informe o ID do novo redator (ou deixe vazio para remover):\n\n${options}`, post.writer_id || '')
-  if (newWriterId === null) return
-  await updateWriter(post.id, newWriterId.trim() || null, post.version)
+const assign = reactive({
+  open: false,
+  title: '',
+  label: '',
+  emptyLabel: '',
+  noOptionsHint: '',
+  options: [] as MemberOption[],
+  currentId: null as string | null,
+  onConfirm: (async () => {}) as (id: string | null) => Promise<unknown>
+})
+
+type Member = { user: { id: string; name: string; email: string } }
+
+function toOptions(members: Member[]): MemberOption[] {
+  return members.map(m => ({ id: m.user.id, name: m.user.name, email: m.user.email }))
+}
+
+function memberName(members: Member[], id: string | null): string {
+  if (!id) return 'Nenhum'
+  return members.find(m => m.user.id === id)?.user.name ?? 'Desvinculado'
+}
+
+function openAssignWriter(post: PostItem) {
+  Object.assign(assign, {
+    open: true,
+    title: 'Trocar Redator',
+    label: `Redator responsável por "${post.title}"`,
+    emptyLabel: 'Nenhum redator',
+    noOptionsHint: 'Nenhum redator vinculado à agência ainda.',
+    options: toOptions(writers.value),
+    currentId: post.writer_id,
+    onConfirm: (id: string | null) => updateWriter(post.id, id, post.version)
+  })
 }
 
 async function handleDeletePost(postId: string) {
@@ -434,11 +477,17 @@ async function promptRenameMedia(media: MediaItem) {
   await updateAlias(media.id, newAlias.trim())
 }
 
-async function promptAssignDesigner(media: MediaItem) {
-  const options = designers.value.map(d => `${d.user.id}: ${d.user.name}`).join('\n')
-  const newId = prompt(`Informe o ID do designer para esta mídia (ou vazio para desatribuir):\n\n${options}`, media.designer_id || '')
-  if (newId === null) return
-  await updateDesigner(media.id, newId.trim() || null)
+function openAssignDesigner(media: MediaItem) {
+  Object.assign(assign, {
+    open: true,
+    title: 'Atribuir Designer',
+    label: `Designer responsável por "${media.alias}"`,
+    emptyLabel: 'Nenhum designer',
+    noOptionsHint: 'Nenhum designer vinculado à agência ainda.',
+    options: toOptions(designers.value),
+    currentId: media.designer_id,
+    onConfirm: (id: string | null) => updateDesigner(media.id, id)
+  })
 }
 
 async function handleDeleteMedia(mediaId: string) {
