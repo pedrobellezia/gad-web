@@ -255,7 +255,6 @@ async function publishPost(post: PostItem) {
   if (!confirm(`Deseja realmente marcar o post "${post.title}" como publicado?`)) return
   try {
     await updateStatus(post.id, 'published', post.version)
-    showToast('Post publicado com sucesso!', 'success')
   } catch {}
 }
 

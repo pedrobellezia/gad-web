@@ -14,6 +14,14 @@ const comments = ref<CommentItem[]>([])
 const activeFilter = ref<string>('all')
 const isLoading = ref<boolean>(false)
 
+const statusLabels: Record<PostStatus, string> = {
+  draft: 'rascunho',
+  review: 'revisão',
+  approved: 'aprovado',
+  denied: 'reprovado',
+  published: 'publicado'
+}
+
 export function usePosts() {
   const { showToast } = useToast()
 
@@ -97,7 +105,7 @@ export function usePosts() {
       if (currentPost.value?.id === postId) {
         currentPost.value = updated
       }
-      showToast(`Status do post alterado para ${status}!`, 'success')
+      showToast(`Status do post alterado para ${statusLabels[status]}!`, 'success')
       return updated
     } catch (err: any) {
       showToast(err.message || 'Erro ao alterar status', 'error')
