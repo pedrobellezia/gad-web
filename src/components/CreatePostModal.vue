@@ -20,19 +20,12 @@
           />
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Cliente Destinatário *</label>
-          <select
-            v-model="form.client_id"
-            required
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
-          >
-            <option value="" class="bg-surface-50 dark:bg-surface-900 text-surface-500 dark:text-surface-400">Selecione um cliente vinculado...</option>
-            <option v-for="cl in clients" :key="cl.user.id" :value="cl.user.id" class="bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100">
-              {{ cl.user.name }} ({{ cl.user.email }})
-            </option>
-          </select>
-        </div>
+        <ClientPicker
+          v-model="form.client_id"
+          label="Cliente Destinatário *"
+          :clients="clients"
+          :invalid="clientInvalid"
+        />
 
         <div>
           <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Conteúdo do Post (Texto/Legenda) *</label>
@@ -65,13 +58,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useMedia } from '@/composables/useMedia'
 import { X } from '@lucide/vue'
 import PostMediaPicker, { type SelectedMedia } from './PostMediaPicker.vue'
+import ClientPicker from './ClientPicker.vue'
 
 const { createPostModalOpen, closeCreatePostModal } = useModals()
 const { createPost, isLoading } = usePosts()
@@ -81,7 +75,12 @@ const { medias, fetchMedias } = useMedia()
 const form = reactive({
   title: '',
   content: '',
-  client_id: ''
+  client_id: null as string | null
+})
+const clientInvalid = ref(false)
+
+watch(() => form.client_id, (id) => {
+  if (id) clientInvalid.value = false
 })
 
 const selectedMedias = ref<SelectedMedia[]>([])
@@ -92,6 +91,10 @@ onMounted(() => {
 })
 
 async function handleSubmit() {
+  if (!form.client_id) {
+    clientInvalid.value = true
+    return
+  }
   try {
     await createPost({
       title: form.title,
@@ -102,7 +105,7 @@ async function handleSubmit() {
     closeCreatePostModal()
     form.title = ''
     form.content = ''
-    form.client_id = ''
+    form.client_id = null
     selectedMedias.value = []
   } catch {}
 }
