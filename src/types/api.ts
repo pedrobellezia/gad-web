@@ -15,22 +15,35 @@ export interface Agency {
   user: User
 }
 
+// Agência vista por um membro (sem e-mail)
+export interface AgencyPublic {
+  id: string
+  cnpj: string
+  user: UserSummary
+}
+
+// Membro listado em /agency/clients, /agency/writers e /agency/designers (sem e-mail)
+export interface AgencyMember {
+  id: string
+  user: UserSummary
+}
+
 export interface ClientProfile {
   id: string
   user: User
-  agency: Agency | null
+  agency: AgencyPublic | null
 }
 
 export interface WriterProfile {
   id: string
   user: User
-  agency: Agency | null
+  agency: AgencyPublic | null
 }
 
 export interface DesignerProfile {
   id: string
   user: User
-  agency: Agency | null
+  agency: AgencyPublic | null
 }
 
 export type ProfileResponse = Agency | ClientProfile | WriterProfile | DesignerProfile
@@ -97,7 +110,6 @@ export interface AuditLogItem {
   agency_id: string | null
   actor_id: string | null
   actor_name: string
-  actor_email: string
   action: string
   resource_type: string
   resource_id: string | null

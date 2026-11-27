@@ -2,18 +2,16 @@ import { ref } from 'vue'
 import { agencyApi } from '@/api/agency'
 import type {
   InviteTokenItem,
-  ClientProfile,
-  WriterProfile,
-  DesignerProfile,
-  Agency
+  AgencyMember,
+  AgencyPublic
 } from '@/types/api'
 import { useToast } from './useToast'
 
 const tokens = ref<InviteTokenItem[]>([])
-const clients = ref<ClientProfile[]>([])
-const writers = ref<WriterProfile[]>([])
-const designers = ref<DesignerProfile[]>([])
-const linkedAgency = ref<Agency | null>(null)
+const clients = ref<AgencyMember[]>([])
+const writers = ref<AgencyMember[]>([])
+const designers = ref<AgencyMember[]>([])
+const linkedAgency = ref<AgencyPublic | null>(null)
 const isLoading = ref<boolean>(false)
 
 export function useAgencyMembers() {

@@ -73,12 +73,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useMediaCache } from '@/composables/useMediaCache'
-import type { ClientProfile } from '@/types/api'
+import type { AgencyMember } from '@/types/api'
 import { Search, Check, UserX } from '@lucide/vue'
 
 const props = defineProps<{
   label: string
-  clients: ClientProfile[]
+  clients: AgencyMember[]
   // Quando informado, exibe a opção de deixar o post sem cliente
   noneLabel?: string
   invalid?: boolean
@@ -99,11 +99,11 @@ const filtered = computed(() => {
   return props.clients.filter(cl => normalize(cl.user.name).includes(term))
 })
 
-function avatarPath(cl: ClientProfile): string | null {
-  return cl.user.avatar ? `/users/${cl.user.id}/avatar?v=${encodeURIComponent(cl.user.avatar)}` : null
+function avatarPath(cl: AgencyMember): string | null {
+  return cl.user.avatar_url
 }
 
-function avatarOf(cl: ClientProfile): string | undefined {
+function avatarOf(cl: AgencyMember): string | undefined {
   return getAvatarUrl(avatarPath(cl))
 }
 

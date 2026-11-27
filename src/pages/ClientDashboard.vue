@@ -278,7 +278,7 @@ import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
-import type { Agency } from '@/types/api'
+import type { AgencyPublic } from '@/types/api'
 import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
@@ -309,7 +309,7 @@ const { isDark, toggleTheme } = useTheme()
 
 const currentSection = ref<'posts' | 'history' | 'agency' | 'profile'>('posts')
 const profileName = ref('')
-const linkedAgency = ref<Agency | null>(null)
+const linkedAgency = ref<AgencyPublic | null>(null)
 const tokenInput = ref('')
 const linking = ref(false)
 const unlinking = ref(false)

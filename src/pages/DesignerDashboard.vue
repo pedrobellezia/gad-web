@@ -279,7 +279,7 @@ import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
-import type { Agency } from '@/types/api'
+import type { AgencyPublic } from '@/types/api'
 import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
@@ -307,7 +307,7 @@ const { isDark, toggleTheme } = useTheme()
 
 const currentSection = ref<'gallery' | 'agency' | 'profile'>('gallery')
 const profileName = ref('')
-const linkedAgency = ref<Agency | null>(null)
+const linkedAgency = ref<AgencyPublic | null>(null)
 const tokenInput = ref('')
 const linking = ref(false)
 const unlinking = ref(false)
