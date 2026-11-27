@@ -97,6 +97,10 @@ export interface PostItem {
   // Resumo público (sem e-mail); null se não houver ou se o usuário foi desativado
   client?: UserSummary | null
   writer?: UserSummary | null
+  // Registro da publicação (API v1.0.6+): nomes no momento em que o post foi publicado
+  published_at?: string | null
+  published_client_name?: string | null
+  published_writer_name?: string | null
   medias: PostMediaItem[]
   comments: CommentItem[]
   created_at: string

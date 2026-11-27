@@ -17,8 +17,22 @@
         v-if="selectedPostForDetail.client !== undefined || selectedPostForDetail.writer !== undefined"
         class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0"
       >
-        <UserChip v-if="selectedPostForDetail.client !== undefined" :user="selectedPostForDetail.client" label="Cliente" empty-text="Sem cliente" />
-        <UserChip v-if="selectedPostForDetail.writer !== undefined" :user="selectedPostForDetail.writer" label="Redator" empty-text="Sem redator" />
+        <UserChip
+          v-if="selectedPostForDetail.client !== undefined"
+          :user="selectedPostForDetail.client"
+          label="Cliente"
+          :empty-text="recordedName(selectedPostForDetail.published_client_name, 'Sem cliente')"
+        />
+        <UserChip
+          v-if="selectedPostForDetail.writer !== undefined"
+          :user="selectedPostForDetail.writer"
+          label="Redator"
+          :empty-text="recordedName(selectedPostForDetail.published_writer_name, 'Sem redator')"
+        />
+        <div v-if="selectedPostForDetail.published_at" class="leading-tight">
+          <p class="text-[10px] uppercase tracking-wider text-surface-500 dark:text-surface-400">Publicado em</p>
+          <p class="text-sm font-medium text-surface-800 dark:text-surface-100">{{ formatDate(selectedPostForDetail.published_at) }}</p>
+        </div>
       </div>
 
       <!-- Navigation Tabs -->
@@ -176,6 +190,14 @@
             <UserCog class="w-4 h-4" />Trocar redator
           </button>
           <button
+            v-if="isWriter"
+            @click="duplicateAsDraft(selectedPostForDetail)"
+            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
+            title="Criar um rascunho novo com o conteúdo deste post"
+          >
+            <Copy class="w-4 h-4" />Duplicar como rascunho
+          </button>
+          <button
             v-if="canManagePost && !isFinalStatus"
             @click="handleEdit"
             class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
@@ -198,12 +220,13 @@ import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
 import { useMediaCache } from '@/composables/useMediaCache'
+import { usePostDuplication } from '@/composables/usePostDuplication'
 import StatusBadge from './StatusBadge.vue'
 import UserChip from './UserChip.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
 import type { CommentItem, PostItem } from '@/types/api'
-import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog } from '@lucide/vue'
+import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog, Copy } from '@lucide/vue'
 
 const emit = defineEmits<{ 'change-writer': [post: PostItem] }>()
 
@@ -212,6 +235,7 @@ const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal, openEd
 const { comments, fetchComments, addComment, removeComment, updateStatus } = usePosts()
 const { currentUser, userAvatarUrl } = useAuth()
 const { getAvatarUrl, loadAvatar } = useMediaCache()
+const { duplicateAsDraft } = usePostDuplication()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')
@@ -225,6 +249,8 @@ const isWriterOwner = computed(() =>
   currentUser.value?.type === 'writer' && selectedPostForDetail.value?.writer_id === currentUser.value.id
 )
 const canManagePost = computed(() => isAgencyOwner.value || isWriterOwner.value)
+// Só redatores criam posts (RN-14), então só eles duplicam
+const isWriter = computed(() => currentUser.value?.type === 'writer')
 const isFinalStatus = computed(() =>
   selectedPostForDetail.value?.status === 'denied' || selectedPostForDetail.value?.status === 'published'
 )
@@ -299,6 +325,10 @@ async function handleDeleteComment(commentId: string) {
 function canDeleteComment(cmt: CommentItem): boolean {
   if (!currentUser.value) return false
   return currentUser.value.type === 'agency' || currentUser.value.id === cmt.author_id
+}
+
+function recordedName(name: string | null | undefined, fallback: string): string {
+  return name ? `${name} (não vinculado)` : fallback
 }
 
 function formatDate(iso: string): string {

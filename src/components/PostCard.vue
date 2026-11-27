@@ -8,7 +8,7 @@
       <UserChip
         :user="shownPerson"
         :label="person === 'writer' ? 'Redator' : 'Cliente'"
-        :empty-text="person === 'writer' ? 'Sem redator' : 'Sem cliente'"
+        :empty-text="personEmptyText"
         size="sm"
       />
     </div>
@@ -76,6 +76,13 @@ const emit = defineEmits<{ open: [post: PostItem] }>()
 
 // undefined = API ainda sem o campo (não afirmar "Sem cliente"); null = realmente sem pessoa
 const shownPerson = computed(() => props.person === 'writer' ? props.post.writer : props.post.client)
+
+// Post publicado guarda o nome de quem era o cliente/redator, mesmo após desvínculo
+const personEmptyText = computed(() => {
+  const recorded = props.person === 'writer' ? props.post.published_writer_name : props.post.published_client_name
+  if (recorded) return `${recorded} (não vinculado)`
+  return props.person === 'writer' ? 'Sem redator' : 'Sem cliente'
+})
 
 const coverMedia = computed(() => {
   if (props.post.medias.length === 0) return null

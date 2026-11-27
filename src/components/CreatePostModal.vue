@@ -2,7 +2,7 @@
   <div v-if="createPostModalOpen" class="fixed inset-0 bg-surface-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-auto">
     <div class="bg-surface-50 dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl fade-in shadow-2xl dark:shadow-card-dark my-8 border border-surface-200 dark:border-surface-700/80 transition-colors">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50">Criar Novo Post</h3>
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50">{{ filledFromPrefill ? 'Duplicar como rascunho' : 'Criar Novo Post' }}</h3>
         <button @click="closeCreatePostModal" class="p-1.5 hover:bg-surface-200/60 dark:hover:bg-surface-700/70 rounded-lg transition">
           <X class="w-5 h-5 text-surface-400" />
         </button>
@@ -67,7 +67,7 @@ import { X } from '@lucide/vue'
 import PostMediaPicker, { type SelectedMedia } from './PostMediaPicker.vue'
 import ClientPicker from './ClientPicker.vue'
 
-const { createPostModalOpen, closeCreatePostModal } = useModals()
+const { createPostModalOpen, createPostPrefill, closeCreatePostModal } = useModals()
 const { createPost, isLoading } = usePosts()
 const { clients, fetchAllMembers } = useAgencyMembers()
 const { medias, fetchMedias } = useMedia()
@@ -84,6 +84,40 @@ watch(() => form.client_id, (id) => {
 })
 
 const selectedMedias = ref<SelectedMedia[]>([])
+
+// Marca que o formulário veio de uma duplicação, para limpar ao abrir uma criação comum
+const filledFromPrefill = ref(false)
+
+function resetForm() {
+  form.title = ''
+  form.content = ''
+  form.client_id = null
+  selectedMedias.value = []
+  clientInvalid.value = false
+}
+
+watch(createPostModalOpen, (open) => {
+  if (!open) return
+  const prefill = createPostPrefill.value
+  if (!prefill) {
+    if (filledFromPrefill.value) resetForm()
+    filledFromPrefill.value = false
+    return
+  }
+  form.title = prefill.title
+  form.content = prefill.content
+  // Só mantém o cliente se ele ainda estiver vinculado à agência
+  form.client_id = clients.value.some(c => c.user.id === prefill.client_id) ? prefill.client_id : null
+  // Só mantém mídias que ainda existem na biblioteca (se ela já foi carregada)
+  const available = new Set(medias.value.map(m => m.id))
+  const kept = medias.value.length > 0
+    ? prefill.medias.filter(sm => available.has(sm.media_id))
+    : prefill.medias
+  selectedMedias.value = kept.map((sm, idx) => ({ media_id: sm.media_id, position: idx }))
+  clientInvalid.value = false
+  createPostPrefill.value = null
+  filledFromPrefill.value = true
+})
 
 onMounted(() => {
   fetchAllMembers().catch(() => {})
@@ -103,10 +137,8 @@ async function handleSubmit() {
       medias: selectedMedias.value
     })
     closeCreatePostModal()
-    form.title = ''
-    form.content = ''
-    form.client_id = null
-    selectedMedias.value = []
+    resetForm()
+    filledFromPrefill.value = false
   } catch {}
 }
 </script>
