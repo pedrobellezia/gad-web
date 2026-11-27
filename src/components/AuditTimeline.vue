@@ -8,8 +8,14 @@
       {{ emptyText }}
     </div>
 
-    <div v-else class="relative border-l-2 border-surface-200 dark:border-surface-700/80 ml-3.5 space-y-4 py-1">
-      <div v-for="log in shownLogs" :key="log.id" class="relative pl-6">
+    <div v-else class="relative ml-3.5 space-y-4 py-1">
+      <div v-for="(log, index) in shownLogs" :key="log.id" class="relative pl-6">
+        <!-- Trecho da linha até a bolinha da próxima atividade (space-y-4 = 1rem; centro da bolinha = 1.375rem).
+             A última atividade fica só com a bolinha. -->
+        <div
+          v-if="index < shownLogs.length - 1"
+          class="absolute -left-[2px] w-0.5 top-[1.375rem] -bottom-[2.375rem] bg-surface-200 dark:bg-surface-700/80"
+        ></div>
         <!-- Dot icon alinhado com o centro da linha vertical (borda de 2px) e com o cabeçalho do card -->
         <div class="absolute -left-[9px] top-3.5 w-4 h-4 rounded-full bg-surface-50 dark:bg-surface-900 border-2 border-brand-500 dark:border-brand-400 flex items-center justify-center shadow-xs z-10">
           <div class="w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400"></div>
