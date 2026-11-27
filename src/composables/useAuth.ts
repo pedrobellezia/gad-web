@@ -4,6 +4,7 @@ import { authApi, type LoginPayload, type RegisterPayload } from '@/api/auth'
 import { meApi } from '@/api/me'
 import type { User, ProfileResponse, UserType } from '@/types/api'
 import { useToast } from './useToast'
+import { useMediaCache } from './useMediaCache'
 
 const token = ref<string | null>(localStorage.getItem('gad_token'))
 const currentUser = ref<User | null>(null)
@@ -101,6 +102,7 @@ export function useAuth() {
       URL.revokeObjectURL(userAvatarUrl.value)
       userAvatarUrl.value = ''
     }
+    useMediaCache().clearMediaCache()
     localStorage.removeItem('gad_token')
     localStorage.removeItem('gad_role')
     if (showMessage) {
