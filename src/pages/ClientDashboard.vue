@@ -1,10 +1,22 @@
 <template>
-  <div class="h-full bg-surface-50 text-surface-800 antialiased flex overflow-hidden">
+  <div class="h-full bg-surface-100/70 dark:bg-surface-900 text-surface-800 dark:text-surface-100 antialiased flex overflow-hidden transition-colors duration-200">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
-      <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center hover:bg-surface-50 transition group">
-        <span class="font-extrabold text-brand-600 text-2xl tracking-tight">GAD</span>
-      </router-link>
+    <aside class="w-64 bg-surface-50 dark:bg-surface-950/80 border-r border-surface-200 dark:border-surface-800 flex flex-col shrink-0 transition-colors duration-200">
+      <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-800 flex items-center justify-between">
+        <router-link to="/" class="flex items-center gap-2 group">
+          <span class="font-extrabold text-brand-600 dark:text-brand-400 text-2xl tracking-tight">GAD</span>
+        </router-link>
+
+        <button
+          type="button"
+          @click="toggleTheme"
+          class="btn-secondary p-2 rounded-lg text-xs font-semibold inline-flex items-center justify-center"
+          :title="isDark ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'"
+        >
+          <Sun v-if="isDark" class="w-4 h-4 text-mint-400" />
+          <Moon v-else class="w-4 h-4 text-brand-600" />
+        </button>
+      </div>
 
       <nav class="flex-1 py-4 px-3 space-y-1">
         <button
@@ -14,7 +26,7 @@
         >
           <FileText class="w-4 h-4" />
           <span>Posts para Aprovação</span>
-          <span v-if="pendingReviewCount > 0" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-warning/20 text-warning-700 font-bold">
+          <span v-if="pendingReviewCount > 0" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold">
             {{ pendingReviewCount }}
           </span>
         </button>
@@ -51,13 +63,13 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-auto p-8 bg-surface-50">
+    <main class="flex-1 overflow-auto p-8 bg-surface-100/70 dark:bg-surface-900 transition-colors duration-200">
       <!-- Section: Posts para Aprovação -->
       <div v-if="currentSection === 'posts'" class="fade-in space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-surface-800">Posts Aguardando Aprovação</h1>
-            <p class="text-sm text-surface-400">Revise o texto, as mídias e decida sobre a aprovação ou solicitação de ajuste</p>
+            <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Posts Aguardando Aprovação</h1>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Revise o texto, as mídias e decida sobre a aprovação ou solicitação de ajuste</p>
           </div>
           <button
             @click="() => fetchPosts()"
@@ -68,45 +80,45 @@
           </button>
         </div>
 
-        <div v-if="isLoading" class="text-center py-12 text-surface-400 text-sm">
+        <div v-if="isLoading" class="text-center py-12 text-surface-500 dark:text-surface-400 text-sm">
           Carregando publicações...
         </div>
 
-        <div v-else-if="pendingReviewPosts.length === 0" class="bg-white rounded-2xl border border-surface-200 p-12 text-center max-w-md mx-auto shadow-xs">
-          <div class="w-12 h-12 rounded-full bg-success/10 text-success-600 flex items-center justify-center mx-auto mb-4">
+        <div v-else-if="pendingReviewPosts.length === 0" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-12 text-center max-w-md mx-auto shadow-xs dark:shadow-card-dark">
+          <div class="w-12 h-12 rounded-full bg-mint-50 dark:bg-mint-500/15 text-mint-600 dark:text-mint-400 flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 class="w-6 h-6" />
           </div>
-          <h3 class="font-semibold text-surface-700 mb-1">Tudo em dia!</h3>
-          <p class="text-xs text-surface-400">Não há nenhuma publicação aguardando sua revisão no momento.</p>
+          <h3 class="font-semibold text-surface-800 dark:text-surface-100 mb-1">Tudo em dia!</h3>
+          <p class="text-xs text-surface-500 dark:text-surface-400">Não há nenhuma publicação aguardando sua revisão no momento.</p>
         </div>
 
         <div v-else class="space-y-4">
           <div
             v-for="post in pendingReviewPosts"
             :key="post.id"
-            class="bg-white rounded-xl border border-surface-200 p-6 shadow-xs hover:border-brand-200 transition"
+            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 transition"
           >
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <h3 class="font-bold text-surface-800 text-base">{{ post.title }}</h3>
+                <h3 class="font-bold text-surface-900 dark:text-surface-100 text-base">{{ post.title }}</h3>
                 <StatusBadge :status="post.status" />
               </div>
-              <span class="text-xs text-surface-400">{{ formatDate(post.created_at) }}</span>
+              <span class="text-xs text-surface-500 dark:text-surface-400">{{ formatDate(post.created_at) }}</span>
             </div>
 
-            <p class="text-sm text-surface-600 mb-4 whitespace-pre-line leading-relaxed">
+            <p class="text-sm text-surface-600 dark:text-surface-300 mb-4 whitespace-pre-line leading-relaxed">
               {{ post.content }}
             </p>
 
-            <div class="flex flex-wrap items-center gap-4 text-xs text-surface-400 mb-4 py-2 border-y border-surface-100">
-              <span class="font-medium text-surface-600">Versão: v{{ post.version }}</span>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-surface-500 dark:text-surface-400 mb-4 py-2 border-y border-surface-200/70 dark:border-surface-700/70">
+              <span class="font-medium text-surface-700 dark:text-surface-200">Versão: v{{ post.version }}</span>
               <span>•</span>
               <span>Criado em: {{ formatDate(post.created_at) }}</span>
               <span>•</span>
               <span>{{ post.medias?.length || 0 }} mídias anexadas</span>
             </div>
 
-            <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
               <button
                 @click="openPostDetailModal(post)"
                 class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
@@ -139,31 +151,31 @@
       <!-- Section: Histórico Completo de Posts -->
       <div v-else-if="currentSection === 'history'" class="fade-in space-y-6">
         <div>
-          <h1 class="text-2xl font-bold text-surface-800">Histórico de Publicações</h1>
-          <p class="text-sm text-surface-400">Todas as publicações aprovadas, reprovadas ou publicadas</p>
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Histórico de Publicações</h1>
+          <p class="text-sm text-surface-500 dark:text-surface-400">Todas as publicações aprovadas, reprovadas ou publicadas</p>
         </div>
 
-        <div v-if="historyPosts.length === 0" class="bg-white rounded-2xl border border-surface-200 p-12 text-center max-w-md mx-auto shadow-xs">
-          <p class="text-sm text-surface-400">Nenhum post no histórico até o momento.</p>
+        <div v-if="historyPosts.length === 0" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-12 text-center max-w-md mx-auto shadow-xs dark:shadow-card-dark">
+          <p class="text-sm text-surface-500 dark:text-surface-400">Nenhum post no histórico até o momento.</p>
         </div>
 
         <div v-else class="space-y-3">
           <div
             v-for="post in historyPosts"
             :key="post.id"
-            class="bg-white rounded-xl border border-surface-200 p-5 shadow-xs flex items-center justify-between cursor-pointer hover:border-surface-300 transition"
+            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 p-5 shadow-xs dark:shadow-card-dark flex items-center justify-between cursor-pointer hover:border-surface-300 dark:hover:border-surface-600 transition"
             @click="openPostDetailModal(post)"
           >
             <div>
               <div class="flex items-center gap-2.5 mb-1">
-                <h4 class="font-semibold text-surface-800 text-sm">{{ post.title }}</h4>
+                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm">{{ post.title }}</h4>
                 <StatusBadge :status="post.status" />
               </div>
-              <p class="text-xs text-surface-400 line-clamp-1 max-w-xl">{{ post.content }}</p>
+              <p class="text-xs text-surface-500 dark:text-surface-400 line-clamp-1 max-w-xl">{{ post.content }}</p>
             </div>
             <div class="text-right">
-              <span class="text-xs text-surface-400 block">{{ formatDate(post.created_at) }}</span>
-              <span class="text-[11px] text-brand-600 font-medium">Ver detalhes →</span>
+              <span class="text-xs text-surface-500 dark:text-surface-400 block">{{ formatDate(post.created_at) }}</span>
+              <span class="text-[11px] text-brand-600 dark:text-brand-400 font-medium">Ver detalhes →</span>
             </div>
           </div>
         </div>
@@ -172,25 +184,25 @@
       <!-- Section: Vínculo com Agência -->
       <div v-else-if="currentSection === 'agency'" class="fade-in space-y-6 max-w-2xl">
         <div>
-          <h1 class="text-2xl font-bold text-surface-800">Vínculo com Agência</h1>
-          <p class="text-sm text-surface-400">Informações da agência responsável pelo gerenciamento do seu conteúdo</p>
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Vínculo com Agência</h1>
+          <p class="text-sm text-surface-500 dark:text-surface-400">Informações da agência responsável pelo gerenciamento do seu conteúdo</p>
         </div>
 
-        <div v-if="linkedAgency" class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+        <div v-if="linkedAgency" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-6">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 flex items-center justify-center">
               <Building2 class="w-6 h-6" />
             </div>
             <div>
-              <span class="text-xs text-success-600 font-semibold tracking-wider uppercase block">Agência Vinculada</span>
-              <h3 class="text-lg font-bold text-surface-800">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-400">{{ linkedAgency.user.email }}</p>
+              <span class="text-xs text-mint-600 dark:text-mint-400 font-semibold tracking-wider uppercase block">Agência Vinculada</span>
+              <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100">{{ linkedAgency.user.name }}</h3>
+              <p class="text-xs text-surface-500 dark:text-surface-400">{{ linkedAgency.user.email }}</p>
             </div>
           </div>
 
-          <div class="bg-surface-50 p-4 rounded-xl border border-surface-200 text-xs space-y-1">
-            <p><strong class="text-surface-700">CNPJ:</strong> {{ linkedAgency.cnpj }}</p>
-            <p><strong class="text-surface-700">Status:</strong> Conexão Ativa</p>
+          <div class="bg-surface-100/80 dark:bg-surface-900/70 p-4 rounded-xl border border-surface-200 dark:border-surface-700/80 text-xs space-y-1 text-surface-600 dark:text-surface-300">
+            <p><strong class="text-surface-800 dark:text-surface-100">CNPJ:</strong> {{ linkedAgency.cnpj }}</p>
+            <p><strong class="text-surface-800 dark:text-surface-100">Status:</strong> Conexão Ativa</p>
           </div>
 
           <div class="pt-2">
@@ -205,13 +217,13 @@
           </div>
         </div>
 
-        <div v-else class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-4">
-          <div class="w-10 h-10 rounded-xl bg-surface-100 text-surface-500 flex items-center justify-center">
+        <div v-else class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-4">
+          <div class="w-10 h-10 rounded-xl bg-surface-100 dark:bg-surface-700/70 text-surface-600 dark:text-surface-300 flex items-center justify-center">
             <Key class="w-5 h-5" />
           </div>
           <div>
-            <h3 class="text-base font-bold text-surface-800">Conectar a uma Agência</h3>
-            <p class="text-xs text-surface-500 mt-1">
+            <h3 class="text-base font-bold text-surface-900 dark:text-surface-100">Conectar a uma Agência</h3>
+            <p class="text-xs text-surface-500 dark:text-surface-400 mt-1">
               Insira o token de vínculo gerado pela agência contratada para permitir a gestão dos seus posts.
             </p>
           </div>
@@ -221,7 +233,7 @@
               v-model="tokenInput"
               type="text"
               placeholder="Ex: TKN-12345678"
-              class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm font-mono"
+              class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm font-mono bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
             />
             <button
               @click="handleLinkAgency"
@@ -238,29 +250,29 @@
       <!-- Section: Meu Perfil -->
       <div v-else-if="currentSection === 'profile'" class="fade-in space-y-6 max-w-2xl">
         <div>
-          <h1 class="text-2xl font-bold text-surface-800">Meu Perfil</h1>
-          <p class="text-sm text-surface-400">Informações cadastrais e configurações de segurança</p>
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Meu Perfil</h1>
+          <p class="text-sm text-surface-500 dark:text-surface-400">Informações cadastrais e configurações de segurança</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+        <div class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-6">
           <AvatarUpload />
 
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">Nome da Empresa / Cliente</label>
+              <label class="block text-xs font-semibold uppercase text-surface-500 dark:text-surface-400 mb-1">Nome da Empresa / Cliente</label>
               <input
                 v-model="profileName"
                 type="text"
-                class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 outline-none text-sm"
+                class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
               />
             </div>
             <div>
-              <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">E-mail Cadastrado</label>
+              <label class="block text-xs font-semibold uppercase text-surface-500 dark:text-surface-400 mb-1">E-mail Cadastrado</label>
               <input
                 :value="user?.email"
                 disabled
                 type="email"
-                class="w-full px-4 py-2.5 rounded-lg border border-surface-200 bg-surface-50 text-surface-400 text-sm cursor-not-allowed"
+                class="w-full px-4 py-2.5 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-100/80 dark:bg-surface-900/60 text-surface-500 dark:text-surface-500 text-sm cursor-not-allowed"
               />
             </div>
 
@@ -275,10 +287,10 @@
             </div>
           </div>
 
-          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
+          <div class="pt-6 border-t border-surface-200 dark:border-surface-700/80 flex items-center justify-between">
             <div>
-              <h4 class="text-sm font-semibold text-surface-800">Segurança da Senha</h4>
-              <p class="text-xs text-surface-400">Altere sua senha de acesso ao portal</p>
+              <h4 class="text-sm font-semibold text-surface-800 dark:text-surface-100">Segurança da Senha</h4>
+              <p class="text-xs text-surface-500 dark:text-surface-400">Altere sua senha de acesso ao portal</p>
             </div>
             <button
               @click="openChangePasswordModal"
@@ -288,10 +300,10 @@
             </button>
           </div>
 
-          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
+          <div class="pt-6 border-t border-surface-200 dark:border-surface-700/80 flex items-center justify-between">
             <div>
-              <h4 class="text-xs font-medium text-surface-500">Desativação da conta</h4>
-              <p class="text-[11px] text-surface-400">Você perderá o acesso até solicitar restauração</p>
+              <h4 class="text-xs font-medium text-surface-600 dark:text-surface-300">Desativação da conta</h4>
+              <p class="text-[11px] text-surface-500 dark:text-surface-400">Você perderá o acesso até solicitar restauração</p>
             </div>
             <button
               @click="handleDeactivateAccount"
@@ -307,7 +319,6 @@
     <!-- Modais -->
     <ApprovalModal />
     <PostDetailModal />
-    <ChangePasswordModal />
   </div>
 </template>
 
@@ -317,6 +328,7 @@ import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
+import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
 import type { Agency } from '@/types/api'
@@ -325,27 +337,28 @@ import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import ApprovalModal from '@/components/ApprovalModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
-import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
   CheckCircle2,
   FileText,
   History,
   Building2,
   User,
-  LogOut,
   RefreshCw,
   Eye,
   Check,
   X,
   Key,
   Link as LinkIcon,
-  Unlink
+  Unlink,
+  Sun,
+  Moon
 } from '@lucide/vue'
 
 const { user, logout, fetchProfile } = useAuth()
 const { posts, isLoading, fetchPosts } = usePosts()
 const { openApprovalModal, openPostDetailModal, openChangePasswordModal } = useModals()
 const { showToast } = useToast()
+const { isDark, toggleTheme } = useTheme()
 
 const currentSection = ref<'posts' | 'history' | 'agency' | 'profile'>('posts')
 const profileName = ref('')

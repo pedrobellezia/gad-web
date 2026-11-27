@@ -1,10 +1,22 @@
 <template>
-  <div class="h-full bg-surface-50 text-surface-800 antialiased flex overflow-hidden">
+  <div class="h-full bg-surface-100/70 dark:bg-surface-900 text-surface-800 dark:text-surface-100 antialiased flex overflow-hidden transition-colors duration-200">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-surface-200 flex flex-col shrink-0">
-      <router-link to="/" class="px-5 py-4 border-b border-surface-200 flex items-center hover:bg-surface-50 transition group">
-        <span class="font-extrabold text-brand-600 text-2xl tracking-tight">GAD</span>
-      </router-link>
+    <aside class="w-64 bg-surface-50 dark:bg-surface-950/80 border-r border-surface-200 dark:border-surface-800 flex flex-col shrink-0 transition-colors duration-200">
+      <div class="px-5 py-4 border-b border-surface-200 dark:border-surface-800 flex items-center justify-between">
+        <router-link to="/" class="flex items-center gap-2 group">
+          <span class="font-extrabold text-brand-600 dark:text-brand-400 text-2xl tracking-tight">GAD</span>
+        </router-link>
+
+        <button
+          type="button"
+          @click="toggleTheme"
+          class="btn-secondary p-2 rounded-lg text-xs font-semibold inline-flex items-center justify-center"
+          :title="isDark ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'"
+        >
+          <Sun v-if="isDark" class="w-4 h-4 text-mint-400" />
+          <Moon v-else class="w-4 h-4 text-brand-600" />
+        </button>
+      </div>
 
       <nav class="flex-1 py-4 px-3 space-y-1">
         <button
@@ -14,7 +26,7 @@
         >
           <Image class="w-4 h-4" />
           <span>Minha Galeria</span>
-          <span v-if="medias.length" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-100 text-surface-600 font-semibold">
+          <span v-if="medias.length" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-200/80 dark:bg-surface-800 text-surface-700 dark:text-surface-200 font-semibold">
             {{ medias.length }}
           </span>
         </button>
@@ -42,13 +54,13 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-auto p-8 bg-surface-50">
+    <main class="flex-1 overflow-auto p-8 bg-surface-100/70 dark:bg-surface-900 transition-colors duration-200">
       <!-- Section: Galeria de Mídias -->
       <div v-if="currentSection === 'gallery'" class="fade-in space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-surface-800">Minha Galeria de Mídias</h1>
-            <p class="text-sm text-surface-400">Faça upload de fotos e vídeos para serem utilizados nos posts da agência</p>
+            <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Minha Galeria de Mídias</h1>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Faça upload de fotos e vídeos para serem utilizados nos posts da agência</p>
           </div>
           <button
             @click="openUploadMediaModal"
@@ -60,17 +72,17 @@
         </div>
 
         <!-- Loading state -->
-        <div v-if="loadingMedias" class="text-center py-12 text-surface-400 text-sm">
+        <div v-if="loadingMedias" class="text-center py-12 text-surface-500 dark:text-surface-400 text-sm">
           Carregando acervo de mídias...
         </div>
 
         <!-- Empty state -->
-        <div v-else-if="medias.length === 0" class="bg-white rounded-2xl border border-surface-200 p-12 text-center max-w-md mx-auto shadow-xs">
-          <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-4">
+        <div v-else-if="medias.length === 0" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-12 text-center max-w-md mx-auto shadow-xs dark:shadow-card-dark">
+          <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-300 flex items-center justify-center mx-auto mb-4">
             <Image class="w-6 h-6" />
           </div>
-          <h3 class="font-semibold text-surface-700 mb-1">Nenhuma mídia cadastrada</h3>
-          <p class="text-xs text-surface-400 mb-6">Envie suas primeiras imagens ou vídeos para iniciar o acervo da agência.</p>
+          <h3 class="font-semibold text-surface-800 dark:text-surface-100 mb-1">Nenhuma mídia cadastrada</h3>
+          <p class="text-xs text-surface-500 dark:text-surface-400 mb-6">Envie suas primeiras imagens ou vídeos para iniciar o acervo da agência.</p>
           <button @click="openUploadMediaModal" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">
             Enviar Agora
           </button>
@@ -81,37 +93,36 @@
           <div
             v-for="media in medias"
             :key="media.id"
-            class="bg-white rounded-xl border border-surface-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col group cursor-pointer"
+            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 overflow-hidden shadow-xs dark:shadow-card-dark hover:shadow-md transition flex flex-col group cursor-pointer"
             @click="openMediaDetailModal(media)"
           >
-            <!-- Media Thumbnail Placeholder / Header -->
-            <div class="h-40 bg-surface-100 flex items-center justify-center relative overflow-hidden">
+            <div class="h-40 bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center relative overflow-hidden">
               <MediaImage
                 v-if="media.mime_type.startsWith('image/')"
                 :media-id="media.id"
                 :alt="media.alias"
               />
-              <span v-else class="text-xs font-mono uppercase px-2 py-1 bg-surface-900/60 text-white rounded-md backdrop-blur-xs">
+              <span v-else class="text-xs font-mono uppercase px-2 py-1 bg-surface-900/75 text-white rounded-md backdrop-blur-xs">
                 {{ media.mime_type.split('/')[1] }}
               </span>
-              <span class="absolute top-2 right-2 text-[10px] bg-black/60 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
+              <span class="absolute top-2 right-2 text-[10px] bg-surface-950/70 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
                 {{ (media.size_bytes / 1024).toFixed(0) }} KB
               </span>
             </div>
 
             <div class="p-4 flex-1 flex flex-col justify-between">
               <div>
-                <h4 class="font-semibold text-surface-800 text-sm truncate mb-1" :title="media.alias">
+                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm truncate mb-1" :title="media.alias">
                   {{ media.alias }}
                 </h4>
-                <p class="text-xs text-surface-400 truncate">
+                <p class="text-xs text-surface-500 dark:text-surface-400 truncate">
                   {{ media.filename }}
                 </p>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-surface-100 flex items-center justify-between text-xs text-surface-400">
-                <span class="text-[11px] font-medium text-brand-600">Ver detalhes & histórico</span>
-                <ChevronRight class="w-4 h-4 text-surface-300 group-hover:text-brand-500 transition" />
+              <div class="mt-4 pt-3 border-t border-surface-200/80 dark:border-surface-700/80 flex items-center justify-between text-xs text-surface-500 dark:text-surface-400">
+                <span class="text-[11px] font-medium text-brand-600 dark:text-brand-400">Ver detalhes & histórico</span>
+                <ChevronRight class="w-4 h-4 text-surface-400 group-hover:text-brand-500 transition" />
               </div>
             </div>
           </div>
@@ -121,26 +132,25 @@
       <!-- Section: Vínculo com Agência -->
       <div v-else-if="currentSection === 'agency'" class="fade-in space-y-6 max-w-2xl">
         <div>
-          <h1 class="text-2xl font-bold text-surface-800">Vínculo com Agência</h1>
-          <p class="text-sm text-surface-400">Gerencie a conexão da sua conta de Designer com uma agência cadastrada</p>
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Vínculo com Agência</h1>
+          <p class="text-sm text-surface-500 dark:text-surface-400">Gerencie a conexão da sua conta de Designer com uma agência cadastrada</p>
         </div>
 
-        <!-- Se já vinculado -->
-        <div v-if="linkedAgency" class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+        <div v-if="linkedAgency" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-6">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 flex items-center justify-center">
               <Building2 class="w-6 h-6" />
             </div>
             <div>
-              <span class="text-xs text-success-600 font-semibold tracking-wider uppercase block">Vinculado Atualmente</span>
-              <h3 class="text-lg font-bold text-surface-800">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-400">{{ linkedAgency.user.email }}</p>
+              <span class="text-xs text-emerald-600 dark:text-mint-400 font-semibold tracking-wider uppercase block">Vinculado Atualmente</span>
+              <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100">{{ linkedAgency.user.name }}</h3>
+              <p class="text-xs text-surface-500 dark:text-surface-400">{{ linkedAgency.user.email }}</p>
             </div>
           </div>
 
-          <div class="bg-surface-50 p-4 rounded-xl border border-surface-200 text-xs space-y-1">
-            <p><strong class="text-surface-700">CNPJ:</strong> {{ linkedAgency.cnpj }}</p>
-            <p><strong class="text-surface-700">Status:</strong> Conta Ativa</p>
+          <div class="bg-surface-100/80 dark:bg-surface-900/70 p-4 rounded-xl border border-surface-200 dark:border-surface-700/80 text-xs space-y-1 text-surface-600 dark:text-surface-300">
+            <p><strong class="text-surface-800 dark:text-surface-100">CNPJ:</strong> {{ linkedAgency.cnpj }}</p>
+            <p><strong class="text-surface-800 dark:text-surface-100">Status:</strong> Conta Ativa</p>
           </div>
 
           <div class="pt-2">
@@ -155,14 +165,13 @@
           </div>
         </div>
 
-        <!-- Se não vinculado -->
-        <div v-else class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-4">
-          <div class="w-10 h-10 rounded-xl bg-surface-100 text-surface-500 flex items-center justify-center">
+        <div v-else class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-4">
+          <div class="w-10 h-10 rounded-xl bg-surface-200/70 dark:bg-surface-700/70 text-surface-600 dark:text-surface-300 flex items-center justify-center">
             <Key class="w-5 h-5" />
           </div>
           <div>
-            <h3 class="text-base font-bold text-surface-800">Vincular a uma Agência</h3>
-            <p class="text-xs text-surface-500 mt-1">
+            <h3 class="text-base font-bold text-surface-900 dark:text-surface-100">Vincular a uma Agência</h3>
+            <p class="text-xs text-surface-500 dark:text-surface-400 mt-1">
               Insira o token de convite fornecido pelo gestor da agência para associar sua conta de Designer à equipe criativa.
             </p>
           </div>
@@ -172,7 +181,7 @@
               v-model="tokenInput"
               type="text"
               placeholder="Ex: TKN-12345678"
-              class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm font-mono"
+              class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm font-mono bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
             />
             <button
               @click="handleLinkAgency"
@@ -189,29 +198,29 @@
       <!-- Section: Meu Perfil -->
       <div v-else-if="currentSection === 'profile'" class="fade-in space-y-6 max-w-2xl">
         <div>
-          <h1 class="text-2xl font-bold text-surface-800">Meu Perfil</h1>
-          <p class="text-sm text-surface-400">Informações pessoais e segurança da conta</p>
+          <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Meu Perfil</h1>
+          <p class="text-sm text-surface-500 dark:text-surface-400">Informações pessoais e segurança da conta</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-surface-200 p-6 shadow-xs space-y-6">
+        <div class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-6">
           <AvatarUpload />
 
           <div class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">Nome Completo</label>
+              <label class="block text-xs font-semibold uppercase text-surface-600 dark:text-surface-400 mb-1">Nome Completo</label>
               <input
                 v-model="profileName"
                 type="text"
-                class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 outline-none text-sm"
+                class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
               />
             </div>
             <div>
-              <label class="block text-xs font-semibold uppercase text-surface-500 mb-1">E-mail</label>
+              <label class="block text-xs font-semibold uppercase text-surface-600 dark:text-surface-400 mb-1">E-mail</label>
               <input
                 :value="user?.email"
                 disabled
                 type="email"
-                class="w-full px-4 py-2.5 rounded-lg border border-surface-200 bg-surface-50 text-surface-400 text-sm cursor-not-allowed"
+                class="w-full px-4 py-2.5 rounded-lg border border-surface-200 dark:border-surface-700 bg-surface-100 dark:bg-surface-900/60 text-surface-500 text-sm cursor-not-allowed"
               />
             </div>
 
@@ -226,10 +235,10 @@
             </div>
           </div>
 
-          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
+          <div class="pt-6 border-t border-surface-200 dark:border-surface-700/80 flex items-center justify-between">
             <div>
-              <h4 class="text-sm font-semibold text-surface-800">Segurança</h4>
-              <p class="text-xs text-surface-400">Altere sua senha de acesso periodicamente</p>
+              <h4 class="text-sm font-semibold text-surface-800 dark:text-surface-100">Segurança</h4>
+              <p class="text-xs text-surface-500 dark:text-surface-400">Altere sua senha de acesso periodicamente</p>
             </div>
             <button
               @click="openChangePasswordModal"
@@ -239,10 +248,10 @@
             </button>
           </div>
 
-          <div class="pt-6 border-t border-surface-200 flex items-center justify-between">
+          <div class="pt-6 border-t border-surface-200 dark:border-surface-700/80 flex items-center justify-between">
             <div>
-              <h4 class="text-xs font-medium text-surface-500">Desativação da conta</h4>
-              <p class="text-[11px] text-surface-400">Você perderá o acesso e vínculos com agências até reativar</p>
+              <h4 class="text-xs font-medium text-surface-600 dark:text-surface-300">Desativação da conta</h4>
+              <p class="text-[11px] text-surface-500 dark:text-surface-400">Você perderá o acesso e vínculos com agências até reativar</p>
             </div>
             <button
               @click="handleDeactivateAccount"
@@ -258,17 +267,16 @@
     <!-- Modais -->
     <UploadMediaModal />
     <MediaDetailModal />
-    <ChangePasswordModal />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useMedia } from '@/composables/useMedia'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
+import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
 import type { Agency } from '@/types/api'
@@ -277,25 +285,24 @@ import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaImage from '@/components/MediaImage.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
-import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
-  Palette,
   Image,
   Building2,
   User,
-  LogOut,
   Upload,
   ChevronRight,
   Key,
   Link as LinkIcon,
-  Unlink
+  Unlink,
+  Sun,
+  Moon
 } from '@lucide/vue'
 
-const router = useRouter()
 const { user, logout, fetchProfile } = useAuth()
 const { medias, isLoading: loadingMedias, fetchMedias } = useMedia()
 const { openUploadMediaModal, openMediaDetailModal, openChangePasswordModal } = useModals()
 const { showToast } = useToast()
+const { isDark, toggleTheme } = useTheme()
 
 const currentSection = ref<'gallery' | 'agency' | 'profile'>('gallery')
 const profileName = ref('')

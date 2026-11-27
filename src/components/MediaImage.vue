@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full flex items-center justify-center overflow-hidden bg-surface-100">
+  <div class="relative w-full h-full flex items-center justify-center overflow-hidden bg-surface-100 dark:bg-surface-900">
     <!-- Imagem carregada via Blob Cache com Autenticação -->
     <img
       v-if="currentUrl"
@@ -12,18 +12,18 @@
     <!-- Estado de carregamento -->
     <div
       v-else-if="isLoading"
-      class="w-full h-full flex flex-col items-center justify-center text-surface-400 animate-pulse p-2"
+      class="w-full h-full flex flex-col items-center justify-center text-surface-500 dark:text-surface-400 animate-pulse p-2"
     >
-      <Loader2 class="w-5 h-5 animate-spin mb-1 text-brand-500" />
-      <span class="text-[10px] text-surface-400">Carregando...</span>
+      <Loader2 class="w-5 h-5 animate-spin mb-1 text-brand-500 dark:text-brand-400" />
+      <span class="text-[10px] text-surface-500 dark:text-surface-400">Carregando...</span>
     </div>
 
     <!-- Falha no carregamento -->
     <div
       v-else
-      class="w-full h-full flex flex-col items-center justify-center text-surface-400 p-2 text-center"
+      class="w-full h-full flex flex-col items-center justify-center text-surface-500 dark:text-surface-500 p-2 text-center"
     >
-      <ImageIcon class="w-6 h-6 mb-1 text-surface-300" />
+      <ImageIcon class="w-6 h-6 mb-1 text-surface-400 dark:text-surface-600" />
       <span class="text-[10px]">Indisponível</span>
     </div>
   </div>

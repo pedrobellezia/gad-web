@@ -1,10 +1,10 @@
 <template>
-  <div class="flex items-center gap-5 p-4 bg-surface-50 rounded-xl border border-surface-200">
+  <div class="flex items-center gap-5 p-4 bg-surface-100/75 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80 transition-colors duration-200">
     <!-- Avatar Preview -->
     <div class="relative group shrink-0">
       <div
         :class="[
-          'w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl select-none overflow-hidden shadow-xs border-2 border-white ring-2 ring-surface-200',
+          'w-20 h-20 rounded-full flex items-center justify-center font-bold text-2xl select-none overflow-hidden shadow-xs border-2 border-surface-50 dark:border-surface-800 ring-2 ring-surface-200 dark:ring-surface-700',
           avatarBgClass
         ]"
       >
@@ -14,7 +14,7 @@
           :alt="currentUser?.name || 'Avatar'"
           class="w-full h-full object-cover"
         />
-        <span v-else class="text-surface-700">
+        <span v-else>
           {{ userInitials }}
         </span>
       </div>
@@ -22,7 +22,7 @@
       <!-- Loading overlay -->
       <div
         v-if="isUploading"
-        class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center text-white"
+        class="absolute inset-0 bg-surface-950/65 rounded-full flex items-center justify-center text-surface-50"
       >
         <Loader2 class="w-6 h-6 animate-spin" />
       </div>
@@ -30,8 +30,8 @@
 
     <!-- Actions -->
     <div class="flex-1 min-w-0">
-      <h4 class="text-sm font-semibold text-surface-800 mb-0.5">Foto de Perfil</h4>
-      <p class="text-xs text-surface-400 mb-3">Formatos aceitos: PNG ou JPEG (máx. 5MB)</p>
+      <h4 class="text-sm font-semibold text-surface-800 dark:text-surface-100 mb-0.5">Foto de Perfil</h4>
+      <p class="text-xs text-surface-500 dark:text-surface-400 mb-3">Formatos aceitos: PNG ou JPEG (máx. 5MB)</p>
 
       <div class="flex items-center gap-2 flex-wrap">
         <label
@@ -56,7 +56,7 @@
           type="button"
           :disabled="isUploading"
           @click="handleRemoveAvatar"
-          class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium text-danger hover:bg-red-50 hover:border-red-200 inline-flex items-center gap-1.5 disabled:opacity-50"
+          class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium text-danger dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/15 hover:border-red-200 dark:hover:border-red-500/30 inline-flex items-center gap-1.5 disabled:opacity-50"
         >
           <Trash2 class="w-3.5 h-3.5" />
           Remover
@@ -89,15 +89,15 @@ const userInitials = computed(() => {
 const avatarBgClass = computed(() => {
   switch (currentUser.value?.type) {
     case 'agency':
-      return 'bg-brand-100 text-brand-700'
+      return 'bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300'
     case 'writer':
-      return 'bg-purple-100 text-purple-700'
+      return 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300'
     case 'designer':
-      return 'bg-pink-100 text-pink-700'
+      return 'bg-pink-100 text-pink-700 dark:bg-pink-500/20 dark:text-pink-300'
     case 'client':
-      return 'bg-emerald-100 text-emerald-700'
+      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
     default:
-      return 'bg-surface-200 text-surface-600'
+      return 'bg-surface-200 text-surface-700 dark:bg-surface-800 dark:text-surface-200'
   }
 })
 

@@ -1,22 +1,22 @@
 <template>
   <div class="space-y-4">
-    <div v-if="isLoading" class="text-center py-6 text-sm text-surface-400">
+    <div v-if="isLoading" class="text-center py-6 text-sm text-surface-500 dark:text-surface-400">
       Carregando histórico...
     </div>
 
-    <div v-else-if="logs.length === 0" class="text-center py-6 text-sm text-surface-400">
+    <div v-else-if="logs.length === 0" class="text-center py-6 text-sm text-surface-500 dark:text-surface-400">
       Nenhum histórico registrado para este item.
     </div>
 
-    <div v-else class="relative border-l-2 border-surface-200 ml-3.5 space-y-4 py-1">
+    <div v-else class="relative border-l-2 border-surface-200 dark:border-surface-700/80 ml-3.5 space-y-4 py-1">
       <div v-for="log in logs" :key="log.id" class="relative pl-6">
         <!-- Dot icon alinhado com o centro da linha vertical (borda de 2px) e com o cabeçalho do card -->
-        <div class="absolute -left-[9px] top-3.5 w-4 h-4 rounded-full bg-white border-2 border-brand-500 flex items-center justify-center shadow-xs z-10">
-          <div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>
+        <div class="absolute -left-[9px] top-3.5 w-4 h-4 rounded-full bg-surface-50 dark:bg-surface-900 border-2 border-brand-500 dark:border-brand-400 flex items-center justify-center shadow-xs z-10">
+          <div class="w-1.5 h-1.5 rounded-full bg-brand-500 dark:bg-brand-400"></div>
         </div>
 
         <!-- Card de Log -->
-        <div class="bg-white border border-surface-200 rounded-xl p-3.5 shadow-xs hover:border-surface-300 transition">
+        <div class="bg-surface-50 dark:bg-surface-900/75 border border-surface-200 dark:border-surface-700/80 rounded-xl p-3.5 shadow-xs dark:shadow-card-dark hover:border-surface-300 dark:hover:border-surface-600 transition">
           <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <span
               :class="[
@@ -26,18 +26,18 @@
             >
               {{ getActionMeta(log.action).label }}
             </span>
-            <span class="text-xs text-surface-400 font-normal">
+            <span class="text-xs text-surface-500 dark:text-surface-400 font-normal">
               {{ formatDate(log.created_at) }}
             </span>
           </div>
 
-          <p class="text-sm text-surface-800 font-normal leading-relaxed mb-2">
+          <p class="text-sm text-surface-800 dark:text-surface-100 font-normal leading-relaxed mb-2">
             {{ log.message }}
           </p>
 
-          <div class="flex items-center gap-1.5 text-xs text-surface-500 pt-1.5 border-t border-surface-100">
-            <span class="font-medium text-surface-700">{{ log.actor_name || 'Sistema' }}</span>
-            <span v-if="log.actor_email" class="text-surface-400">({{ log.actor_email }})</span>
+          <div class="flex items-center gap-1.5 text-xs text-surface-500 dark:text-surface-400 pt-1.5 border-t border-surface-200/80 dark:border-surface-700/80">
+            <span class="font-medium text-surface-700 dark:text-surface-200">{{ log.actor_name || 'Sistema' }}</span>
+            <span v-if="log.actor_email" class="text-surface-500 dark:text-surface-400">({{ log.actor_email }})</span>
           </div>
         </div>
       </div>
@@ -68,57 +68,57 @@ function getActionMeta(action: string): ActionMeta {
 
   const map: Record<string, ActionMeta> = {
     // Post
-    post_created: { label: 'Post Criado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    post_create: { label: 'Post Criado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    create_post: { label: 'Post Criado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    create: { label: 'Criado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    created: { label: 'Criado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    post_created: { label: 'Post Criado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    post_create: { label: 'Post Criado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    create_post: { label: 'Post Criado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    create: { label: 'Criado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    created: { label: 'Criado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
 
-    post_updated: { label: 'Post Editado', colorClass: 'bg-blue-50 text-blue-700 border-blue-200' },
-    post_update: { label: 'Post Editado', colorClass: 'bg-blue-50 text-blue-700 border-blue-200' },
-    update_post: { label: 'Post Editado', colorClass: 'bg-blue-50 text-blue-700 border-blue-200' },
-    update: { label: 'Atualizado', colorClass: 'bg-blue-50 text-blue-700 border-blue-200' },
-    updated: { label: 'Atualizado', colorClass: 'bg-blue-50 text-blue-700 border-blue-200' },
+    post_updated: { label: 'Post Editado', colorClass: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30' },
+    post_update: { label: 'Post Editado', colorClass: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30' },
+    update_post: { label: 'Post Editado', colorClass: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30' },
+    update: { label: 'Atualizado', colorClass: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30' },
+    updated: { label: 'Atualizado', colorClass: 'bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/30' },
 
-    post_approved: { label: 'Aprovado', colorClass: 'bg-green-50 text-green-700 border-green-200' },
-    approve: { label: 'Aprovado', colorClass: 'bg-green-50 text-green-700 border-green-200' },
-    approved: { label: 'Aprovado', colorClass: 'bg-green-50 text-green-700 border-green-200' },
+    post_approved: { label: 'Aprovado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    approve: { label: 'Aprovado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    approved: { label: 'Aprovado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
 
-    post_rejected: { label: 'Reprovado', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    post_denied: { label: 'Reprovado', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    reject: { label: 'Reprovado', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    rejected: { label: 'Reprovado', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    denied: { label: 'Reprovado', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
+    post_rejected: { label: 'Reprovado', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    post_denied: { label: 'Reprovado', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    reject: { label: 'Reprovado', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    rejected: { label: 'Reprovado', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    denied: { label: 'Reprovado', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
 
-    post_review: { label: 'Enviado para Revisão', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' },
-    submit_review: { label: 'Enviado para Revisão', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' },
-    review: { label: 'Em Revisão', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' },
-    pending: { label: 'Pendente', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' },
+    post_review: { label: 'Enviado para Revisão', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' },
+    submit_review: { label: 'Enviado para Revisão', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' },
+    review: { label: 'Em Revisão', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' },
+    pending: { label: 'Pendente', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' },
 
-    post_published: { label: 'Publicado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    publish: { label: 'Publicado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    published: { label: 'Publicado', colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    post_published: { label: 'Publicado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    publish: { label: 'Publicado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
+    published: { label: 'Publicado', colorClass: 'bg-emerald-50 dark:bg-mint-500/15 text-emerald-700 dark:text-mint-300 border-emerald-200 dark:border-mint-500/30' },
 
-    post_deleted: { label: 'Post Excluído', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    delete: { label: 'Excluído', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
-    deleted: { label: 'Excluído', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
+    post_deleted: { label: 'Post Excluído', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    delete: { label: 'Excluído', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
+    deleted: { label: 'Excluído', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
 
     // Comentários
-    comment_created: { label: 'Comentário Adicionado', colorClass: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    comment_added: { label: 'Comentário Adicionado', colorClass: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    comment_deleted: { label: 'Comentário Removido', colorClass: 'bg-slate-50 text-slate-700 border-slate-200' },
+    comment_created: { label: 'Comentário Adicionado', colorClass: 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30' },
+    comment_added: { label: 'Comentário Adicionado', colorClass: 'bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30' },
+    comment_deleted: { label: 'Comentário Removido', colorClass: 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 border-surface-200 dark:border-surface-700' },
 
     // Mídias
-    media_uploaded: { label: 'Mídia Enviada', colorClass: 'bg-purple-50 text-purple-700 border-purple-200' },
-    media_created: { label: 'Mídia Enviada', colorClass: 'bg-purple-50 text-purple-700 border-purple-200' },
-    media_attached: { label: 'Mídia Anexada', colorClass: 'bg-purple-50 text-purple-700 border-purple-200' },
-    media_detached: { label: 'Mídia Removida', colorClass: 'bg-slate-50 text-slate-700 border-slate-200' },
-    media_reordered: { label: 'Mídias Reordenadas', colorClass: 'bg-sky-50 text-sky-700 border-sky-200' },
-    media_deleted: { label: 'Mídia Excluída', colorClass: 'bg-rose-50 text-rose-700 border-rose-200' },
+    media_uploaded: { label: 'Mídia Enviada', colorClass: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30' },
+    media_created: { label: 'Mídia Enviada', colorClass: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30' },
+    media_attached: { label: 'Mídia Anexada', colorClass: 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/30' },
+    media_detached: { label: 'Mídia Removida', colorClass: 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 border-surface-200 dark:border-surface-700' },
+    media_reordered: { label: 'Mídias Reordenadas', colorClass: 'bg-sky-50 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-500/30' },
+    media_deleted: { label: 'Mídia Excluída', colorClass: 'bg-rose-50 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/30' },
 
     // Status
-    status_changed: { label: 'Status Alterado', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' },
-    status_change: { label: 'Status Alterado', colorClass: 'bg-amber-50 text-amber-700 border-amber-200' }
+    status_changed: { label: 'Status Alterado', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' },
+    status_change: { label: 'Status Alterado', colorClass: 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30' }
   }
 
   if (map[act]) return map[act]
@@ -141,7 +141,7 @@ function getActionMeta(action: string): ActionMeta {
 
   return {
     label: formatted || 'Ação Registrada',
-    colorClass: 'bg-surface-100 text-surface-700 border-surface-200'
+    colorClass: 'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300 border-surface-200 dark:border-surface-700'
   }
 }
 

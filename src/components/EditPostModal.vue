@@ -1,80 +1,80 @@
 <template>
-  <div v-if="editPostModalOpen && selectedPostForEdit" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-auto">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-2xl fade-in shadow-2xl my-8 border border-surface-200">
+  <div v-if="editPostModalOpen && selectedPostForEdit" class="fixed inset-0 bg-surface-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-auto">
+    <div class="bg-surface-50 dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl fade-in shadow-2xl dark:shadow-card-dark my-8 border border-surface-200 dark:border-surface-700/80 transition-colors">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h3 class="text-lg font-semibold text-surface-800">Editar Post</h3>
-          <p class="text-xs text-surface-400">Versão atual: {{ selectedPostForEdit.version }}</p>
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50">Editar Post</h3>
+          <p class="text-xs text-surface-500 dark:text-surface-400">Versão atual: {{ selectedPostForEdit.version }}</p>
         </div>
-        <button @click="closeEditPostModal" class="p-1 hover:bg-surface-100 rounded-lg">
+        <button @click="closeEditPostModal" class="p-1.5 hover:bg-surface-200/60 dark:hover:bg-surface-700/70 rounded-lg transition">
           <X class="w-5 h-5 text-surface-400" />
         </button>
       </div>
 
-      <div v-if="selectedPostForEdit.status === 'approved'" class="p-3 mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+      <div v-if="selectedPostForEdit.status === 'approved'" class="p-3 mb-4 rounded-xl bg-amber-50 dark:bg-amber-500/15 border border-amber-200 dark:border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2">
         <AlertCircle class="w-4 h-4 shrink-0" />
         <span><strong>Atenção:</strong> Este post já está aprovado. Qualquer alteração fará o post voltar automaticamente para <strong>Revisão</strong>!</span>
       </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-surface-600 mb-1">Título do Post *</label>
+          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Título do Post *</label>
           <input
             v-model="form.title"
             type="text"
             required
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm"
+            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
           />
         </div>
 
         <div v-if="canEditClient">
-          <label class="block text-sm font-medium text-surface-600 mb-1">Cliente Destinatário (Agência)</label>
+          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Cliente Destinatário (Agência)</label>
           <select
             v-model="form.client_id"
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm bg-white"
+            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
           >
-            <option :value="null">Nenhum cliente (volta para rascunho)</option>
-            <option v-for="cl in clients" :key="cl.user.id" :value="cl.user.id">
+            <option :value="null" class="bg-surface-50 dark:bg-surface-900 text-surface-700 dark:text-surface-200">Nenhum cliente (volta para rascunho)</option>
+            <option v-for="cl in clients" :key="cl.user.id" :value="cl.user.id" class="bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100">
               {{ cl.user.name }} ({{ cl.user.email }})
             </option>
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-surface-600 mb-1">Conteúdo do Post *</label>
+          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Conteúdo do Post *</label>
           <textarea
             v-model="form.content"
             required
             rows="4"
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm"
+            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100"
           ></textarea>
         </div>
 
         <!-- Media Selector with Positions -->
         <div>
           <div class="flex items-center justify-between mb-2">
-            <label class="block text-sm font-medium text-surface-600">
+            <label class="block text-sm font-medium text-surface-700 dark:text-surface-200">
               Mídias Anexadas e Posições
             </label>
-            <span class="text-xs text-surface-400">{{ selectedMedias.length }} selecionada(s)</span>
+            <span class="text-xs text-surface-500 dark:text-surface-400">{{ selectedMedias.length }} selecionada(s)</span>
           </div>
 
           <div v-if="selectedMedias.length > 0" class="space-y-2 mb-3">
             <div
               v-for="(sm, idx) in selectedMedias"
               :key="sm.media_id"
-              class="flex items-center justify-between p-2.5 bg-surface-50 border border-surface-200 rounded-lg text-xs"
+              class="flex items-center justify-between p-2.5 bg-surface-100/80 dark:bg-surface-900/75 border border-surface-200 dark:border-surface-700/80 rounded-lg text-xs"
             >
               <div class="flex items-center gap-2">
-                <span class="font-bold text-surface-500">Posição {{ idx }}</span>
-                <span class="text-surface-700 font-medium">{{ getMediaAlias(sm.media_id) }}</span>
+                <span class="font-bold text-surface-500 dark:text-surface-400">Posição {{ idx }}</span>
+                <span class="text-surface-800 dark:text-surface-100 font-medium">{{ getMediaAlias(sm.media_id) }}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button
                   type="button"
                   :disabled="idx === 0"
                   @click="moveMedia(idx, -1)"
-                  class="p-1 hover:bg-surface-200 rounded disabled:opacity-30"
+                  class="p-1 hover:bg-surface-200 dark:hover:bg-surface-700 rounded disabled:opacity-30"
                 >
                   <ArrowUp class="w-3.5 h-3.5" />
                 </button>
@@ -82,14 +82,14 @@
                   type="button"
                   :disabled="idx === selectedMedias.length - 1"
                   @click="moveMedia(idx, 1)"
-                  class="p-1 hover:bg-surface-200 rounded disabled:opacity-30"
+                  class="p-1 hover:bg-surface-200 dark:hover:bg-surface-700 rounded disabled:opacity-30"
                 >
                   <ArrowDown class="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
                   @click="removeMedia(idx)"
-                  class="p-1 hover:bg-red-50 text-danger rounded ml-1"
+                  class="p-1 hover:bg-red-50 dark:hover:bg-red-500/15 text-danger dark:text-red-400 rounded ml-1"
                 >
                   <Trash2 class="w-3.5 h-3.5" />
                 </button>
@@ -98,9 +98,9 @@
           </div>
 
           <!-- Quick pick from agency media library -->
-          <div class="border border-surface-200 rounded-xl p-3 bg-surface-50 max-h-40 overflow-y-auto">
-            <p class="text-xs font-semibold text-surface-500 mb-2">Adicionar mais mídias da biblioteca:</p>
-            <div v-if="medias.length === 0" class="text-xs text-surface-400 text-center py-2">
+          <div class="border border-surface-200 dark:border-surface-700/80 rounded-xl p-3 bg-surface-100/70 dark:bg-surface-900/70 max-h-40 overflow-y-auto">
+            <p class="text-xs font-semibold text-surface-600 dark:text-surface-300 mb-2">Adicionar mais mídias da biblioteca:</p>
+            <div v-if="medias.length === 0" class="text-xs text-surface-500 dark:text-surface-400 text-center py-2">
               Nenhuma mídia encontrada na biblioteca.
             </div>
             <div v-else class="flex flex-wrap gap-1.5">
@@ -110,7 +110,7 @@
                 type="button"
                 @click="toggleAddMedia(m.id)"
                 :disabled="isMediaSelected(m.id)"
-                :class="['px-2.5 py-1 rounded text-xs border transition flex items-center gap-1', isMediaSelected(m.id) ? 'bg-surface-200 border-surface-300 text-surface-400' : 'bg-white border-surface-200 hover:border-brand-500 text-surface-700']"
+                :class="['px-2.5 py-1 rounded text-xs border transition flex items-center gap-1', isMediaSelected(m.id) ? 'bg-surface-200 dark:bg-surface-800 border-surface-300 dark:border-surface-700 text-surface-400 dark:text-surface-500' : 'bg-surface-50 dark:bg-surface-800 border-surface-200 dark:border-surface-700 hover:border-brand-500 text-surface-700 dark:text-surface-200']"
               >
                 <Plus class="w-3 h-3" /> {{ m.alias }}
               </button>
@@ -223,8 +223,6 @@ async function handleSubmit() {
       version: selectedPostForEdit.value.version
     }
 
-    // Apenas a agência tem permissão para alterar/enviar o destinatário (client_id).
-    // Se outro papel enviar a chave no JSON, a API bloqueia com 403 Forbidden.
     if (canEditClient.value) {
       payload.client_id = form.client_id
     }

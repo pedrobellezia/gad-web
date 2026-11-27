@@ -1,30 +1,30 @@
 <template>
-  <div v-if="mediaDetailModalOpen && selectedMediaForDetail" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-auto">
-    <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col fade-in shadow-2xl border border-surface-200 overflow-hidden">
+  <div v-if="mediaDetailModalOpen && selectedMediaForDetail" class="fixed inset-0 bg-surface-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 overflow-auto">
+    <div class="bg-surface-50 dark:bg-surface-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col fade-in shadow-2xl dark:shadow-card-dark border border-surface-200 dark:border-surface-700/80 overflow-hidden transition-colors">
       <!-- Header -->
-      <div class="p-6 border-b border-surface-200 flex items-center justify-between">
+      <div class="p-6 border-b border-surface-200 dark:border-surface-700/80 flex items-center justify-between">
         <div>
-          <h3 class="text-lg font-bold text-surface-800">Detalhes da Mídia</h3>
-          <p class="text-xs text-surface-400 font-mono">ID: {{ selectedMediaForDetail.id }}</p>
+          <h3 class="text-lg font-bold text-surface-900 dark:text-surface-50">Detalhes da Mídia</h3>
+          <p class="text-xs text-surface-500 dark:text-surface-400 font-mono">ID: {{ selectedMediaForDetail.id }}</p>
         </div>
-        <button @click="closeMediaDetailModal" class="p-1 hover:bg-surface-100 rounded-lg">
+        <button @click="closeMediaDetailModal" class="p-1.5 hover:bg-surface-200/60 dark:hover:bg-surface-700/70 rounded-lg transition">
           <X class="w-5 h-5 text-surface-400" />
         </button>
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="flex border-b border-surface-200 px-6 bg-surface-50">
+      <div class="flex border-b border-surface-200 dark:border-surface-700/80 px-6 bg-surface-100/70 dark:bg-surface-900/60">
         <button
           @click="activeTab = 'info'"
           :class="['py-3 px-4 text-sm font-medium border-b-2 transition flex items-center gap-2',
-            activeTab === 'info' ? 'border-brand-500 text-brand-600 font-semibold' : 'border-transparent text-surface-500 hover:text-surface-700']"
+            activeTab === 'info' ? 'border-brand-500 text-brand-600 dark:text-brand-400 font-semibold' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-200']"
         >
           <Image class="w-4 h-4" /> Informações & Arquivo
         </button>
         <button
           @click="activeTab = 'audit'"
           :class="['py-3 px-4 text-sm font-medium border-b-2 transition flex items-center gap-2',
-            activeTab === 'audit' ? 'border-brand-500 text-brand-600 font-semibold' : 'border-transparent text-surface-500 hover:text-surface-700']"
+            activeTab === 'audit' ? 'border-brand-500 text-brand-600 dark:text-brand-400 font-semibold' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-200']"
         >
           <History class="w-4 h-4" /> Histórico de Alterações
         </button>
@@ -35,7 +35,7 @@
         <!-- Tab: Info -->
         <div v-if="activeTab === 'info'" class="space-y-6">
           <!-- Preview container -->
-          <div class="bg-surface-900 rounded-xl overflow-hidden flex items-center justify-center p-4 max-h-72">
+          <div class="bg-surface-900 dark:bg-surface-950 rounded-xl overflow-hidden flex items-center justify-center p-4 max-h-72 border border-surface-800">
             <template v-if="previewUrl">
               <img
                 v-if="selectedMediaForDetail.mime_type.startsWith('image/')"
@@ -57,25 +57,25 @@
 
           <!-- Metadados -->
           <div class="grid grid-cols-2 gap-3 text-xs">
-            <div class="bg-surface-50 p-3 rounded-lg border border-surface-200">
-              <span class="text-surface-400 block mb-0.5">Tipo MIME</span>
-              <span class="font-medium text-surface-700">{{ selectedMediaForDetail.mime_type }}</span>
+            <div class="bg-surface-100/80 dark:bg-surface-900/75 p-3 rounded-lg border border-surface-200 dark:border-surface-700/80">
+              <span class="text-surface-500 dark:text-surface-400 block mb-0.5">Tipo MIME</span>
+              <span class="font-medium text-surface-800 dark:text-surface-100">{{ selectedMediaForDetail.mime_type }}</span>
             </div>
-            <div class="bg-surface-50 p-3 rounded-lg border border-surface-200">
-              <span class="text-surface-400 block mb-0.5">Tamanho</span>
-              <span class="font-medium text-surface-700">{{ (selectedMediaForDetail.size_bytes / 1024).toFixed(1) }} KB</span>
+            <div class="bg-surface-100/80 dark:bg-surface-900/75 p-3 rounded-lg border border-surface-200 dark:border-surface-700/80">
+              <span class="text-surface-500 dark:text-surface-400 block mb-0.5">Tamanho</span>
+              <span class="font-medium text-surface-800 dark:text-surface-100">{{ (selectedMediaForDetail.size_bytes / 1024).toFixed(1) }} KB</span>
             </div>
           </div>
 
           <!-- Edição de Alias -->
-          <form @submit.prevent="handleSaveAlias" class="p-4 bg-surface-50 rounded-xl border border-surface-200 space-y-3">
-            <label class="block text-xs font-semibold uppercase text-surface-600">Editar Alias da Mídia</label>
+          <form @submit.prevent="handleSaveAlias" class="p-4 bg-surface-100/80 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80 space-y-3">
+            <label class="block text-xs font-semibold uppercase text-surface-600 dark:text-surface-300">Editar Alias da Mídia</label>
             <div class="flex gap-2">
               <input
                 v-model="newAlias"
                 type="text"
                 required
-                class="flex-1 px-3 py-2 text-sm rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none"
+                class="flex-1 px-3 py-2 text-sm rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none bg-surface-50 dark:bg-surface-950/60 text-surface-800 dark:text-surface-100"
               />
               <button
                 type="submit"
@@ -88,8 +88,8 @@
           </form>
 
           <!-- Ação perigosa: Excluir -->
-          <div class="pt-4 border-t border-surface-200 flex justify-between items-center">
-            <span class="text-xs text-surface-400">Deseja remover esta mídia do sistema?</span>
+          <div class="pt-4 border-t border-surface-200 dark:border-surface-700/80 flex justify-between items-center">
+            <span class="text-xs text-surface-500 dark:text-surface-400">Deseja remover esta mídia do sistema?</span>
             <button
               type="button"
               @click="handleDelete"

@@ -1,30 +1,30 @@
 <template>
-  <div v-if="changePasswordModalOpen" class="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md fade-in shadow-2xl border border-surface-200">
+  <div v-if="changePasswordModalOpen" class="fixed inset-0 bg-surface-950/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+    <div class="bg-surface-50 dark:bg-surface-800 rounded-2xl p-6 w-full max-w-md fade-in shadow-2xl dark:shadow-card-dark border border-surface-200 dark:border-surface-700/80 transition-colors">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-surface-800">Alterar Minha Senha</h3>
-        <button @click="closeChangePasswordModal" class="p-1 hover:bg-surface-100 rounded-lg">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50">Alterar Minha Senha</h3>
+        <button @click="closeChangePasswordModal" class="p-1.5 hover:bg-surface-200/60 dark:hover:bg-surface-700/70 rounded-lg transition">
           <X class="w-5 h-5 text-surface-400" />
         </button>
       </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-surface-600 mb-1">Senha Atual *</label>
+          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Senha Atual *</label>
           <input
             v-model="currentPassword"
             type="password"
             required
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm"
+            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 transition-colors"
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-surface-600 mb-1">Nova Senha *</label>
+          <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Nova Senha *</label>
           <input
             v-model="newPassword"
             type="password"
             required
-            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 outline-none text-sm"
+            class="w-full px-4 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 transition-colors"
           />
         </div>
 
