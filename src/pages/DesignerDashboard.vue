@@ -97,14 +97,7 @@
             @click="openMediaDetailModal(media)"
           >
             <div class="h-40 bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center relative overflow-hidden">
-              <MediaImage
-                v-if="media.mime_type.startsWith('image/')"
-                :media-id="media.id"
-                :alt="media.alias"
-              />
-              <span v-else class="text-xs font-mono uppercase px-2 py-1 bg-surface-900/75 text-white rounded-md backdrop-blur-xs">
-                {{ media.mime_type.split('/')[1] }}
-              </span>
+              <MediaImage :media-id="media.id" :alt="media.alias" :video="media.media_type === 'video'" />
               <span class="absolute top-2 right-2 text-[10px] bg-surface-950/70 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
                 {{ (media.size_bytes / 1024).toFixed(0) }} KB
               </span>

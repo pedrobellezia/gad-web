@@ -184,17 +184,14 @@
             :key="m.id"
             class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 overflow-hidden flex flex-col shadow-xs dark:shadow-card-dark"
           >
-            <div class="h-36 bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center overflow-hidden relative">
-              <MediaImage
-                v-if="m.media_type === 'image'"
-                :media-id="m.id"
-                :alt="m.alias"
-              />
-              <div v-else class="flex flex-col items-center justify-center text-surface-500 dark:text-surface-400">
-                <Video class="w-8 h-8 mb-1" />
-                <span class="text-xs">Vídeo MP4</span>
-              </div>
-            </div>
+            <button
+              type="button"
+              @click="openMediaViewer(m)"
+              class="h-36 w-full bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center overflow-hidden relative cursor-zoom-in"
+              :title="m.media_type === 'video' ? 'Assistir vídeo original' : 'Ver imagem original'"
+            >
+              <MediaImage :media-id="m.id" :alt="m.alias" :video="m.media_type === 'video'" />
+            </button>
 
             <div class="p-3 flex-1 flex flex-col justify-between">
               <div>
@@ -364,10 +361,11 @@ import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import MediaImage from '@/components/MediaImage.vue'
 import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
+import { useMediaViewer } from '@/composables/useMediaViewer'
 import type { PostItem, MediaItem } from '@/types/api'
 import {
   LayoutDashboard, FileText, Image, Key, Users, Activity,
-  Plus, Edit, Trash2, Video, Clock, CheckCircle2, Sun, Moon
+  Plus, Edit, Trash2, Clock, CheckCircle2, Sun, Moon
 } from '@lucide/vue'
 
 const { confirmDialog, promptDialog } = useDialog()
@@ -385,6 +383,7 @@ const filterOptions = [
 const { fetchProfile } = useAuth()
 const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, updateWriter, deletePost } = usePosts()
 useAutoRefresh(() => refreshPostsSilently())
+const { openMediaViewer } = useMediaViewer()
 const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
 const { openPostDetailModal } = useModals()
