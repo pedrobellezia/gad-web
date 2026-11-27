@@ -5,6 +5,8 @@ export interface AuditLogParams {
   action?: string
   resource_type?: 'post' | 'media' | 'user' | 'invite_token' | 'comment'
   resource_id?: string
+  // Busca parcial na mensagem, em quem fez e no item afetado (ignora maiúsculas e acentos)
+  search?: string
   skip?: number
   limit?: number
 }

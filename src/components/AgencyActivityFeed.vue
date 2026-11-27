@@ -15,6 +15,17 @@
       </button>
     </div>
 
+    <div class="relative max-w-3xl mb-3">
+      <Search class="w-4 h-4 text-surface-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+      <input
+        v-model="search"
+        type="search"
+        maxlength="100"
+        placeholder="Buscar por nome, post, mídia ou qualquer texto da atividade..."
+        class="w-full pl-9 pr-3 py-2.5 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
+      />
+    </div>
+
     <div class="flex flex-wrap gap-1.5 bg-surface-50 dark:bg-surface-800/90 border border-surface-200 dark:border-surface-700/80 p-1 rounded-lg text-xs w-fit mb-6">
       <button
         v-for="opt in filterOptions"
@@ -28,7 +39,11 @@
     </div>
 
     <div class="max-w-3xl">
-      <AuditTimeline :entries="logs" show-resource empty-text="Nenhuma atividade registrada." />
+      <AuditTimeline
+        :entries="logs"
+        show-resource
+        :empty-text="emptyText"
+      />
 
       <p v-if="loadError" class="text-sm text-danger dark:text-red-400 text-center mt-4">{{ loadError }}</p>
 
@@ -47,11 +62,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { auditApi, type AuditLogParams } from '@/api/audit'
 import type { AuditLogItem } from '@/types/api'
 import AuditTimeline from './AuditTimeline.vue'
-import { RefreshCw } from '@lucide/vue'
+import { RefreshCw, Search } from '@lucide/vue'
 
 type Filter = 'all' | NonNullable<AuditLogParams['resource_type']>
 
@@ -71,6 +86,16 @@ const logs = ref<AuditLogItem[]>([])
 const isLoading = ref(false)
 const hasMore = ref(false)
 const loadError = ref('')
+const search = ref('')
+// Termo efetivamente enviado à API (após o debounce)
+const appliedSearch = ref('')
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+const emptyText = computed(() =>
+  appliedSearch.value
+    ? `Nenhuma atividade encontrada para "${appliedSearch.value}".`
+    : 'Nenhuma atividade registrada.'
+)
 // Ignora respostas de requisições antigas (ex.: troca rápida de filtro)
 let requestSeq = 0
 
@@ -81,6 +106,7 @@ async function fetchPage(skip: number) {
   try {
     const page = await auditApi.getAuditLogs({
       resource_type: filter.value === 'all' ? undefined : filter.value,
+      search: appliedSearch.value || undefined,
       skip,
       limit: PAGE_SIZE
     })
@@ -109,5 +135,21 @@ function setFilter(value: Filter) {
   reload()
 }
 
+// Busca no servidor (alcança todo o histórico, não só a página carregada), com debounce
+watch(search, (value) => {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    const term = value.trim()
+    if (term === appliedSearch.value) return
+    appliedSearch.value = term
+    logs.value = []
+    reload()
+  }, 350)
+})
+
 onMounted(reload)
+
+onBeforeUnmount(() => {
+  if (searchTimer) clearTimeout(searchTimer)
+})
 </script>
