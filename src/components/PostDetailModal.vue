@@ -163,7 +163,7 @@ import { ref, watch } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
-import { useAgencyMembers } from '@/composables/useAgencyMembers'
+import { useMediaCache } from '@/composables/useMediaCache'
 import StatusBadge from './StatusBadge.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
@@ -173,7 +173,7 @@ import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucid
 const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal } = useModals()
 const { comments, fetchComments, addComment, removeComment } = usePosts()
 const { currentUser, userAvatarUrl } = useAuth()
-const { clients, writers } = useAgencyMembers()
+const { getAvatarUrl, loadAvatar } = useMediaCache()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')
@@ -183,6 +183,16 @@ watch(selectedPostForDetail, (post) => {
     activeTab.value = 'content'
     fetchComments(post.id).catch(() => {})
   }
+})
+
+// Baixa (uma vez, via cache) a foto de perfil de cada autor dos comentários
+watch(comments, (list) => {
+  const paths = new Set(
+    list
+      .filter(cmt => !isOwnComment(cmt) && cmt.author?.avatar_url)
+      .map(cmt => cmt.author!.avatar_url!)
+  )
+  paths.forEach(path => loadAvatar(path))
 })
 
 async function handleSendComment() {
@@ -218,55 +228,30 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function isOwnComment(cmt: CommentItem): boolean {
+  return !!currentUser.value && currentUser.value.id === cmt.author_id
+}
+
 function getCommentAuthorName(cmt: CommentItem): string {
-  if (cmt.author?.name) return cmt.author.name
-  if (cmt.author_name) return cmt.author_name
-
-  if (currentUser.value && currentUser.value.id === cmt.author_id) {
-    return `${currentUser.value.name} (Você)`
-  }
-
-  const clientMatch = clients.value.find(c => c.user.id === cmt.author_id)
-  if (clientMatch) return clientMatch.user.name
-
-  const writerMatch = writers.value.find(w => w.user.id === cmt.author_id)
-  if (writerMatch) return writerMatch.user.name
-
-  if (selectedPostForDetail.value) {
-    if (selectedPostForDetail.value.client_id === cmt.author_id) {
-      return 'Cliente'
-    }
-    if (selectedPostForDetail.value.writer_id === cmt.author_id) {
-      return 'Redator'
-    }
-    if (selectedPostForDetail.value.agency_id === cmt.author_id) {
-      return 'Agência'
-    }
-  }
-
-  return `Autor #${cmt.author_id.slice(0, 8)}`
+  // author é null quando a conta do autor foi desativada (undefined: API sem o campo)
+  if (cmt.author === null) return 'Usuário desativado'
+  if (!cmt.author) return isOwnComment(cmt) ? 'Você' : 'Usuário'
+  return isOwnComment(cmt) ? `${cmt.author.name} (Você)` : cmt.author.name
 }
 
 function getCommentAuthorInitials(cmt: CommentItem): string {
-  const name = getCommentAuthorName(cmt)
-  if (!name || name.startsWith('Autor #')) return 'U'
-  const clean = name.replace('(Você)', '').trim()
-  const parts = clean.split(' ').filter(Boolean)
+  if (!cmt.author) return '?'
+  const parts = cmt.author.name.split(' ').filter(Boolean)
   if (parts.length >= 2) {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
   }
-  return clean.slice(0, 2).toUpperCase()
+  return cmt.author.name.slice(0, 2).toUpperCase()
 }
 
 function getCommentAuthorAvatar(cmt: CommentItem): string | null {
-  if (currentUser.value && currentUser.value.id === cmt.author_id && userAvatarUrl.value) {
+  if (isOwnComment(cmt) && userAvatarUrl.value) {
     return userAvatarUrl.value
   }
-
-  if (cmt.author?.avatar) {
-    return cmt.author.avatar
-  }
-
-  return null
+  return getAvatarUrl(cmt.author?.avatar_url) || null
 }
 </script>

@@ -54,14 +54,20 @@ export interface PostMediaItem {
   media: MediaItem
 }
 
+export interface UserSummary {
+  id: string
+  name: string
+  type: UserType
+  avatar_url: string | null
+}
+
 export interface CommentItem {
   id: string
   post_id: string
   author_id: string
   content: string
   created_at: string
-  author?: User | null
-  author_name?: string | null
+  author?: UserSummary | null
 }
 
 export type PostStatus = 'draft' | 'review' | 'approved' | 'denied' | 'published'
