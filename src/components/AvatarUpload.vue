@@ -67,12 +67,14 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
 import { meApi } from '@/api/me'
 import { Camera, Trash2, Loader2 } from '@lucide/vue'
 
+const { confirmDialog } = useDialog()
 const { currentUser, userAvatarUrl, fetchProfile } = useAuth()
 const { showToast } = useToast()
 const isUploading = ref(false)
@@ -132,7 +134,7 @@ async function handleFileChange(event: Event) {
 }
 
 async function handleRemoveAvatar() {
-  if (!confirm('Deseja realmente remover sua foto de perfil?')) return
+  if (!(await confirmDialog({ title: 'Remover foto de perfil', message: 'Deseja realmente remover sua foto de perfil?', confirmLabel: 'Remover', danger: true }))) return
   isUploading.value = true
   try {
     await meApi.deleteAvatar()

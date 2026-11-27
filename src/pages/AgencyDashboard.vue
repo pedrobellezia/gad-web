@@ -372,6 +372,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, reactive, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
@@ -393,6 +394,7 @@ import {
   Plus, Edit, Trash2, Video, Clock, CheckCircle2, Sun, Moon
 } from '@lucide/vue'
 
+const { confirmDialog, promptDialog } = useDialog()
 const currentSection = ref('overview')
 
 const filterOptions = [
@@ -427,7 +429,7 @@ function countStatus(st: string): number {
 }
 
 async function publishPost(post: PostItem) {
-  if (!confirm(`Confirmar publicação do post "${post.title}"? Esta ação é definitiva.`)) return
+  if (!(await confirmDialog({ title: 'Publicar post', message: `Confirmar publicação do post "${post.title}"? Esta ação é definitiva.`, confirmLabel: 'Publicar' }))) return
   await updateStatus(post.id, 'published', post.version)
 }
 
@@ -467,12 +469,12 @@ function openAssignWriter(post: PostItem) {
 }
 
 async function handleDeletePost(postId: string) {
-  if (!confirm('Deseja realmente excluir este post?')) return
+  if (!(await confirmDialog({ title: 'Excluir post', message: 'Deseja realmente excluir este post?', confirmLabel: 'Excluir', danger: true }))) return
   await deletePost(postId)
 }
 
 async function promptRenameMedia(media: MediaItem) {
-  const newAlias = prompt('Informe o novo alias da mídia:', media.alias)
+  const newAlias = await promptDialog({ title: 'Renomear mídia', label: 'Novo alias da mídia', defaultValue: media.alias, confirmLabel: 'Renomear' })
   if (!newAlias || newAlias.trim() === media.alias) return
   await updateAlias(media.id, newAlias.trim())
 }
@@ -491,12 +493,12 @@ function openAssignDesigner(media: MediaItem) {
 }
 
 async function handleDeleteMedia(mediaId: string) {
-  if (!confirm('Deseja realmente excluir esta mídia da biblioteca?')) return
+  if (!(await confirmDialog({ title: 'Excluir mídia', message: 'Deseja realmente excluir esta mídia da biblioteca?', confirmLabel: 'Excluir', danger: true }))) return
   await deleteMedia(mediaId)
 }
 
 async function promptGenerateTokens() {
-  const qtyStr = prompt('Quantos tokens deseja gerar? (1 a 100)', '4')
+  const qtyStr = await promptDialog({ title: 'Gerar tokens de convite', label: 'Quantidade de tokens (1 a 100)', defaultValue: '4', inputType: 'number', min: 1, max: 100, confirmLabel: 'Gerar' })
   if (!qtyStr) return
   const qty = parseInt(qtyStr, 10)
   if (isNaN(qty) || qty < 1 || qty > 100) {
@@ -512,12 +514,12 @@ function copyToken(tokenStr: string) {
 }
 
 async function handleDeleteToken(tokenStr: string) {
-  if (!confirm('Deseja excluir este token de convite?')) return
+  if (!(await confirmDialog({ title: 'Excluir token', message: 'Deseja excluir este token de convite?', confirmLabel: 'Excluir', danger: true }))) return
   await deleteToken(tokenStr)
 }
 
 async function handleUnlink(userId: string) {
-  if (!confirm('Deseja realmente desvincular este membro da agência?')) return
+  if (!(await confirmDialog({ title: 'Desvincular membro', message: 'Deseja realmente desvincular este membro da agência?', confirmLabel: 'Desvincular', danger: true }))) return
   await unlinkMember(userId)
 }
 
