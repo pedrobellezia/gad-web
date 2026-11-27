@@ -48,6 +48,16 @@ export function useMediaCache() {
     return loadCached(mediaId, () => mediaApi.getFileBlob(mediaId))
   }
 
+  // Miniatura (chave separada do original no cache)
+  function getThumbnailUrl(mediaId: string): string | undefined {
+    return mediaUrlCache.value[`thumb:${mediaId}`]
+  }
+
+  function loadThumbnail(mediaId: string): Promise<string> {
+    if (!mediaId) return Promise.resolve('')
+    return loadCached(`thumb:${mediaId}`, () => mediaApi.getThumbnailBlob(mediaId))
+  }
+
   // avatarPath é o `avatar_url` retornado pela API (caminho relativo com ?v=<versão>)
   function getAvatarUrl(avatarPath: string | null | undefined): string | undefined {
     return avatarPath ? mediaUrlCache.value[avatarPath] : undefined
@@ -71,6 +81,8 @@ export function useMediaCache() {
     mediaUrlCache,
     getMediaUrl,
     loadMedia,
+    getThumbnailUrl,
+    loadThumbnail,
     getAvatarUrl,
     loadAvatar,
     clearMediaCache

@@ -16,14 +16,11 @@
     <!-- Primeira mídia do post -->
     <div class="relative aspect-square bg-surface-200/70 dark:bg-surface-900 overflow-hidden">
       <MediaImage
-        v-if="coverMedia && coverMedia.media_type === 'image'"
+        v-if="coverMedia"
         :media-id="coverMedia.id"
         :alt="coverMedia.alias"
+        :video="coverMedia.media_type === 'video'"
       />
-      <div v-else-if="coverMedia" class="w-full h-full flex flex-col items-center justify-center text-surface-500 dark:text-surface-400">
-        <Video class="w-10 h-10 mb-1" />
-        <span class="text-xs">Vídeo</span>
-      </div>
       <div v-else class="w-full h-full flex flex-col items-center justify-center text-surface-400 dark:text-surface-500">
         <ImageOff class="w-10 h-10 mb-1" />
         <span class="text-xs">Sem mídia</span>
@@ -65,7 +62,7 @@ import StatusBadge from './StatusBadge.vue'
 import MediaImage from './MediaImage.vue'
 import UserChip from './UserChip.vue'
 import type { PostItem } from '@/types/api'
-import { Video, ImageOff, Layers, MessageCircle } from '@lucide/vue'
+import { ImageOff, Layers, MessageCircle } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   post: PostItem

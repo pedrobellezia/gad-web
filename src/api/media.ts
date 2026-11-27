@@ -41,5 +41,12 @@ export const mediaApi = {
     return apiFetch<Blob>(`/media/${mediaId}/file`, {
       method: 'GET'
     })
+  },
+
+  // Miniatura WebP (imagens e vídeos), usada nas grades e cards
+  getThumbnailBlob(mediaId: string) {
+    return apiFetch<Blob>(`/media/${mediaId}/thumbnail`, {
+      method: 'GET'
+    })
   }
 }

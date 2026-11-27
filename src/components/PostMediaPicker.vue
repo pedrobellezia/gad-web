@@ -12,11 +12,16 @@
         :key="sm.media_id"
         class="relative rounded-lg overflow-hidden border border-surface-200 dark:border-surface-700/80 bg-surface-100/80 dark:bg-surface-900/75"
       >
-        <div class="aspect-square">
-          <MediaImage v-if="mediaById(sm.media_id)?.media_type !== 'video'" :media-id="sm.media_id" :alt="aliasOf(sm.media_id)" />
-          <div v-else class="w-full h-full flex items-center justify-center text-surface-500 dark:text-surface-400">
-            <Video class="w-6 h-6" />
-          </div>
+        <div class="aspect-square relative">
+          <MediaImage :media-id="sm.media_id" :alt="aliasOf(sm.media_id)" :video="mediaById(sm.media_id)?.media_type === 'video'" />
+          <button
+            type="button"
+            @click="preview(sm.media_id)"
+            class="absolute bottom-1 right-1 p-1 rounded-md bg-surface-950/70 text-white hover:bg-surface-950/90 transition"
+            title="Ver original"
+          >
+            <Maximize2 class="w-3.5 h-3.5" />
+          </button>
         </div>
         <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-surface-950/75 text-surface-50 text-[10px] font-mono font-semibold">
           #{{ idx + 1 }}
@@ -77,22 +82,18 @@
         Nenhuma mídia corresponde a "{{ search }}".
       </div>
       <div v-else class="grid grid-cols-3 sm:grid-cols-5 gap-2 max-h-64 overflow-y-auto pr-1">
+        <div v-for="m in filtered" :key="m.id" class="relative">
         <button
-          v-for="m in filtered"
-          :key="m.id"
           type="button"
           @click="toggle(m.id)"
           :title="isSelected(m.id) ? `Remover ${m.alias}` : `Adicionar ${m.alias}`"
           :class="[
-            'relative rounded-lg overflow-hidden border-2 text-left transition',
+            'relative w-full rounded-lg overflow-hidden border-2 text-left transition',
             isSelected(m.id) ? 'border-brand-500' : 'border-transparent hover:border-brand-300 dark:hover:border-brand-500/50'
           ]"
         >
           <div class="aspect-square bg-surface-200/70 dark:bg-surface-800">
-            <MediaImage v-if="m.media_type === 'image'" :media-id="m.id" :alt="m.alias" />
-            <div v-else class="w-full h-full flex items-center justify-center text-surface-500 dark:text-surface-400">
-              <Video class="w-6 h-6" />
-            </div>
+            <MediaImage :media-id="m.id" :alt="m.alias" :video="m.media_type === 'video'" />
           </div>
           <span
             v-if="isSelected(m.id)"
@@ -102,6 +103,15 @@
           </span>
           <p class="px-1.5 py-1 text-[11px] text-surface-700 dark:text-surface-200 truncate bg-surface-50 dark:bg-surface-800">{{ m.alias }}</p>
         </button>
+        <button
+          type="button"
+          @click="preview(m.id)"
+          class="absolute top-1 left-1 p-1 rounded-md bg-surface-950/70 text-white hover:bg-surface-950/90 transition"
+          title="Ver original"
+        >
+          <Maximize2 class="w-3.5 h-3.5" />
+        </button>
+        </div>
       </div>
     </div>
   </div>
@@ -111,7 +121,8 @@
 import { ref, computed } from 'vue'
 import MediaImage from './MediaImage.vue'
 import type { MediaItem } from '@/types/api'
-import { Search, Check, Trash2, ArrowLeft, ArrowRight, Video } from '@lucide/vue'
+import { Search, Check, Trash2, ArrowLeft, ArrowRight, Maximize2 } from '@lucide/vue'
+import { useMediaViewer } from '@/composables/useMediaViewer'
 
 export interface SelectedMedia {
   media_id: string
@@ -127,6 +138,14 @@ const props = defineProps<{
 }>()
 
 const model = defineModel<SelectedMedia[]>({ required: true })
+
+const { openMediaViewer } = useMediaViewer()
+
+// Abre o original sob demanda (a grade mostra só miniaturas)
+function preview(id: string) {
+  const media = mediaById(id)
+  if (media) openMediaViewer(media)
+}
 
 const search = ref('')
 

@@ -84,17 +84,18 @@
                 <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-surface-950/75 text-surface-50 text-xs font-mono font-semibold z-10">
                   Posição #{{ pm.position }}
                 </div>
-                <div class="h-36 bg-surface-200 dark:bg-surface-900 flex items-center justify-center overflow-hidden">
+                <button
+                  type="button"
+                  @click="openMediaViewer(pm.media)"
+                  class="h-36 w-full bg-surface-200 dark:bg-surface-900 flex items-center justify-center overflow-hidden cursor-zoom-in"
+                  :title="pm.media.media_type === 'video' ? 'Assistir vídeo original' : 'Ver imagem original'"
+                >
                   <MediaImage
-                    v-if="pm.media.media_type === 'image'"
                     :media-id="pm.media.id"
                     :alt="pm.media.alias"
+                    :video="pm.media.media_type === 'video'"
                   />
-                  <div v-else class="flex flex-col items-center justify-center text-surface-500 dark:text-surface-400">
-                    <Video class="w-8 h-8 mb-1" />
-                    <span class="text-xs">Vídeo MP4</span>
-                  </div>
-                </div>
+                </button>
                 <div class="p-2.5">
                   <p class="text-xs font-medium text-surface-700 dark:text-surface-200 truncate">{{ pm.media.alias }}</p>
                   <p class="text-[11px] text-surface-500 dark:text-surface-400 font-mono">{{ formatBytes(pm.media.size_bytes) }}</p>
@@ -221,12 +222,13 @@ import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
 import { useMediaCache } from '@/composables/useMediaCache'
 import { usePostDuplication } from '@/composables/usePostDuplication'
+import { useMediaViewer } from '@/composables/useMediaViewer'
 import StatusBadge from './StatusBadge.vue'
 import UserChip from './UserChip.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
 import type { CommentItem, PostItem } from '@/types/api'
-import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog, Copy } from '@lucide/vue'
+import { X, FileText, MessageCircle, History, Send, Trash2, Undo2, Edit, UserCog, Copy } from '@lucide/vue'
 
 const emit = defineEmits<{ 'change-writer': [post: PostItem] }>()
 
@@ -236,6 +238,7 @@ const { comments, fetchComments, addComment, removeComment, updateStatus } = use
 const { currentUser, userAvatarUrl } = useAuth()
 const { getAvatarUrl, loadAvatar } = useMediaCache()
 const { duplicateAsDraft } = usePostDuplication()
+const { openMediaViewer } = useMediaViewer()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')

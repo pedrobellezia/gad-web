@@ -1,6 +1,6 @@
 <template>
   <div ref="root" class="relative w-full h-full flex items-center justify-center overflow-hidden bg-surface-100 dark:bg-surface-900">
-    <!-- Imagem carregada via Blob Cache com Autenticação -->
+    <!-- Miniatura carregada via Blob Cache com Autenticação -->
     <img
       v-if="currentUrl"
       :src="currentUrl"
@@ -17,6 +17,15 @@
       <span class="text-[10px] text-surface-500 dark:text-surface-400">Carregando...</span>
     </div>
 
+    <!-- Vídeo sem miniatura disponível -->
+    <div
+      v-else-if="failed && video"
+      class="w-full h-full flex flex-col items-center justify-center text-surface-500 dark:text-surface-400 p-2 text-center"
+    >
+      <Video class="w-7 h-7 mb-1" />
+      <span class="text-[10px]">Vídeo</span>
+    </div>
+
     <!-- Falha no carregamento -->
     <div
       v-else-if="failed"
@@ -27,39 +36,59 @@
     </div>
 
     <!-- Ainda fora da área visível: placeholder neutro, sem download -->
-    <ImageIcon v-else class="w-6 h-6 text-surface-300 dark:text-surface-700" />
+    <component :is="video ? Video : ImageIcon" v-else class="w-6 h-6 text-surface-300 dark:text-surface-700" />
+
+    <!-- Indicador de vídeo sobre a miniatura -->
+    <span
+      v-if="video && currentUrl"
+      class="absolute inset-0 flex items-center justify-center pointer-events-none"
+    >
+      <span class="w-10 h-10 rounded-full bg-surface-950/60 text-white flex items-center justify-center backdrop-blur-xs">
+        <Play class="w-5 h-5 ml-0.5" fill="currentColor" />
+      </span>
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useMediaCache } from '@/composables/useMediaCache'
-import { Image as ImageIcon, Loader2 } from '@lucide/vue'
+import { Image as ImageIcon, Loader2, Video, Play } from '@lucide/vue'
 
+// Sempre exibe a miniatura (leve). O original só é baixado sob demanda, no visualizador.
 const props = defineProps<{
   mediaId: string
   alt?: string
   imgClass?: string
+  video?: boolean
 }>()
 
-const { mediaUrlCache, loadMedia } = useMediaCache()
+const { mediaUrlCache, loadThumbnail, loadMedia } = useMediaCache()
 const root = ref<HTMLElement | null>(null)
 const isLoading = ref(false)
 const failed = ref(false)
 const isVisible = ref(false)
+// Imagem cuja miniatura falhou (ex.: API sem a rota) usa o original como fallback
+const usingOriginal = ref(false)
 let observer: IntersectionObserver | null = null
 
 const currentUrl = computed(() => {
-  return props.mediaId ? mediaUrlCache.value[props.mediaId] || '' : ''
+  if (!props.mediaId) return ''
+  const key = usingOriginal.value ? props.mediaId : `thumb:${props.mediaId}`
+  return mediaUrlCache.value[key] || ''
 })
 
 async function fetchImage() {
-  if (!props.mediaId || mediaUrlCache.value[props.mediaId]) return
+  if (!props.mediaId || currentUrl.value) return
 
   isLoading.value = true
   failed.value = false
   try {
-    const url = await loadMedia(props.mediaId)
+    let url = await loadThumbnail(props.mediaId)
+    if (!url && !props.video) {
+      usingOriginal.value = true
+      url = await loadMedia(props.mediaId)
+    }
     failed.value = !url
   } finally {
     isLoading.value = false
@@ -91,6 +120,7 @@ function observe() {
 
 watch(() => props.mediaId, (newId) => {
   failed.value = false
+  usingOriginal.value = false
   if (!newId) return
   if (isVisible.value) fetchImage()
   else if (!observer) observe()

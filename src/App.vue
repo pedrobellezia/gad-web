@@ -4,6 +4,7 @@
     <ToastContainer />
     <ChangePasswordModal />
     <DialogHost />
+    <MediaViewer />
   </div>
 </template>
 
@@ -12,6 +13,7 @@ import { onMounted } from 'vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import DialogHost from '@/components/DialogHost.vue'
+import MediaViewer from '@/components/MediaViewer.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useTheme } from '@/composables/useTheme'
 
