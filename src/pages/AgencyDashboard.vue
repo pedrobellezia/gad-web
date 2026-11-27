@@ -49,6 +49,12 @@
         >
           <Users class="w-4 h-4" />Membros da Equipe
         </button>
+        <button
+          @click="currentSection = 'activity'"
+          :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'activity' }]"
+        >
+          <Activity class="w-4 h-4" />Atividades
+        </button>
       </nav>
 
       <SidebarUserFooter />
@@ -315,6 +321,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Section: Activity -->
+      <AgencyActivityFeed v-if="currentSection === 'activity'" class="fade-in" />
     </main>
 
     <!-- Modals -->
@@ -353,9 +362,10 @@ import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import MediaImage from '@/components/MediaImage.vue'
+import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
 import type { PostItem, MediaItem } from '@/types/api'
 import {
-  LayoutDashboard, FileText, Image, Key, Users,
+  LayoutDashboard, FileText, Image, Key, Users, Activity,
   Plus, Edit, Trash2, Video, Clock, CheckCircle2, Sun, Moon
 } from '@lucide/vue'
 
