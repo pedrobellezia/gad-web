@@ -267,7 +267,6 @@
     <!-- Modais -->
     <UploadMediaModal />
     <MediaDetailModal />
-    <ChangePasswordModal />
   </div>
 </template>
 
@@ -286,7 +285,6 @@ import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaImage from '@/components/MediaImage.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
-import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
   Image,
   Building2,

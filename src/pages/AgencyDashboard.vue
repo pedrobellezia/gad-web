@@ -354,7 +354,6 @@
     <CreatePostModal />
     <EditPostModal />
     <PostDetailModal />
-    <ChangePasswordModal />
   </div>
 </template>
 
@@ -365,7 +364,6 @@ import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
-import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useMedia } from '@/composables/useMedia'

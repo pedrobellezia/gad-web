@@ -319,7 +319,6 @@
     <!-- Modais -->
     <ApprovalModal />
     <PostDetailModal />
-    <ChangePasswordModal />
   </div>
 </template>
 
@@ -338,7 +337,6 @@ import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import ApprovalModal from '@/components/ApprovalModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
-import ChangePasswordModal from '@/components/ChangePasswordModal.vue'
 import {
   CheckCircle2,
   FileText,
