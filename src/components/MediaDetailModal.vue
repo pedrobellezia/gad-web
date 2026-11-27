@@ -112,6 +112,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, watch } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { useMedia } from '@/composables/useMedia'
@@ -120,6 +121,7 @@ import { useToast } from '@/composables/useToast'
 import AuditTimeline from '@/components/AuditTimeline.vue'
 import { X, Image, History, Trash2 } from '@lucide/vue'
 
+const { confirmDialog } = useDialog()
 const { mediaDetailModalOpen, selectedMediaForDetail, closeMediaDetailModal } = useModals()
 const { updateAlias, deleteMedia } = useMedia()
 const { loadMedia, getMediaUrl } = useMediaCache()
@@ -163,7 +165,7 @@ async function handleSaveAlias() {
 
 async function handleDelete() {
   if (!selectedMediaForDetail.value) return
-  if (!confirm(`Tem certeza que deseja excluir a mídia "${selectedMediaForDetail.value.alias}"?`)) return
+  if (!(await confirmDialog({ title: 'Excluir mídia', message: `Tem certeza que deseja excluir a mídia "${selectedMediaForDetail.value.alias}"?`, confirmLabel: 'Excluir', danger: true }))) return
   isDeleting.value = true
   try {
     await deleteMedia(selectedMediaForDetail.value.id)

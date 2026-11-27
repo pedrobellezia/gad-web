@@ -323,6 +323,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
@@ -354,6 +355,7 @@ import {
   Moon
 } from '@lucide/vue'
 
+const { confirmDialog } = useDialog()
 const { user, logout, fetchProfile } = useAuth()
 const { posts, isLoading, fetchPosts } = usePosts()
 const { openApprovalModal, openPostDetailModal, openChangePasswordModal } = useModals()
@@ -412,7 +414,7 @@ async function handleLinkAgency() {
 }
 
 async function handleUnlink() {
-  if (!confirm('Deseja realmente se desvincular desta agência?')) return
+  if (!(await confirmDialog({ title: 'Desvincular da agência', message: 'Deseja realmente se desvincular desta agência?', confirmLabel: 'Desvincular', danger: true }))) return
   unlinking.value = true
   try {
     const res = await agencyApi.selfUnlink()
@@ -441,7 +443,7 @@ async function handleSaveProfile() {
 }
 
 async function handleDeactivateAccount() {
-  if (!confirm('Tem certeza absoluta que deseja desativar sua conta? Você precisará de restauração para acessá-la novamente.')) return
+  if (!(await confirmDialog({ title: 'Desativar conta', message: 'Tem certeza absoluta que deseja desativar sua conta? Você precisará de restauração para acessá-la novamente.', confirmLabel: 'Desativar', danger: true }))) return
   try {
     await meApi.deactivateAccount()
     showToast('Conta desativada com sucesso.', 'info')

@@ -159,6 +159,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, watch } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
@@ -170,6 +171,7 @@ import MediaImage from './MediaImage.vue'
 import type { CommentItem } from '@/types/api'
 import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucide/vue'
 
+const { confirmDialog } = useDialog()
 const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal } = useModals()
 const { comments, fetchComments, addComment, removeComment } = usePosts()
 const { currentUser, userAvatarUrl } = useAuth()
@@ -195,7 +197,7 @@ async function handleSendComment() {
 
 async function handleDeleteComment(commentId: string) {
   if (!selectedPostForDetail.value) return
-  if (!confirm('Deseja realmente remover este comentário?')) return
+  if (!(await confirmDialog({ title: 'Remover comentário', message: 'Deseja realmente remover este comentário?', confirmLabel: 'Remover', danger: true }))) return
   await removeComment(selectedPostForDetail.value.id, commentId)
 }
 

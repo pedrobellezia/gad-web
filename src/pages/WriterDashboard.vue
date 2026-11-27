@@ -201,6 +201,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDialog } from '@/composables/useDialog'
 import { ref, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
@@ -218,6 +219,7 @@ import { useToast } from '@/composables/useToast'
 import type { PostItem } from '@/types/api'
 import { FileText, Building, User, Plus, Edit, Trash2, CheckCircle2, Sun, Moon } from '@lucide/vue'
 
+const { confirmDialog } = useDialog()
 const currentSection = ref('posts')
 
 const { currentUser, logout, fetchProfile } = useAuth()
@@ -252,14 +254,14 @@ async function sendToReview(post: PostItem) {
 }
 
 async function publishPost(post: PostItem) {
-  if (!confirm(`Deseja realmente marcar o post "${post.title}" como publicado?`)) return
+  if (!(await confirmDialog({ title: 'Publicar post', message: `Deseja realmente marcar o post "${post.title}" como publicado?`, confirmLabel: 'Publicar' }))) return
   try {
     await updateStatus(post.id, 'published', post.version)
   } catch {}
 }
 
 async function handleDelete(postId: string) {
-  if (!confirm('Deseja realmente excluir este post?')) return
+  if (!(await confirmDialog({ title: 'Excluir post', message: 'Deseja realmente excluir este post?', confirmLabel: 'Excluir', danger: true }))) return
   await deletePost(postId)
 }
 
@@ -273,7 +275,7 @@ async function handleLinkByToken() {
 }
 
 async function handleSelfUnlink() {
-  if (!confirm('Deseja realmente desvincular-se da agência?')) return
+  if (!(await confirmDialog({ title: 'Desvincular da agência', message: 'Deseja realmente se desvincular da agência?', confirmLabel: 'Desvincular', danger: true }))) return
   await selfUnlink()
   await fetchPosts()
 }
@@ -292,7 +294,7 @@ async function handleUpdateProfile() {
 }
 
 async function handleDeactivate() {
-  if (!confirm('Tem certeza de que deseja desativar sua conta?')) return
+  if (!(await confirmDialog({ title: 'Desativar conta', message: 'Tem certeza de que deseja desativar sua conta?', confirmLabel: 'Desativar', danger: true }))) return
   try {
     await meApi.deactivateAccount()
     logout(false)
