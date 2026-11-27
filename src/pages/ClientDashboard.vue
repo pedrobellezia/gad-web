@@ -93,7 +93,7 @@
         </div>
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-          <PostCard v-for="post in pendingReviewPosts" :key="post.id" :post="post" @open="openPostDetailModal">
+          <PostCard v-for="post in pendingReviewPosts" :key="post.id" :post="post" person="writer" @open="openPostDetailModal">
             <template #actions>
               <button
                 @click="openApprovalModal(post, 'approve')"
@@ -124,7 +124,7 @@
         </div>
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-          <PostCard v-for="post in historyPosts" :key="post.id" :post="post" @open="openPostDetailModal" />
+          <PostCard v-for="post in historyPosts" :key="post.id" :post="post" person="writer" @open="openPostDetailModal" />
         </div>
       </div>
 

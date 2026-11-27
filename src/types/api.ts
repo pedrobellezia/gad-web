@@ -94,6 +94,9 @@ export interface PostItem {
   agency_id: string | null
   client_id: string | null
   writer_id: string | null
+  // Resumo público (sem e-mail); null se não houver ou se o usuário foi desativado
+  client?: UserSummary | null
+  writer?: UserSummary | null
   medias: PostMediaItem[]
   comments: CommentItem[]
   created_at: string

@@ -3,6 +3,16 @@
     class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 overflow-hidden flex flex-col shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 hover:shadow-card-hover transition cursor-pointer"
     @click="emit('open', post)"
   >
+    <!-- Quem está ligado ao post (cliente, ou redator no painel do cliente) -->
+    <div class="px-3.5 py-2.5 border-b border-surface-200/80 dark:border-surface-700/80">
+      <UserChip
+        :user="person === 'writer' ? post.writer : post.client"
+        :label="person === 'writer' ? 'Redator' : 'Cliente'"
+        :empty-text="person === 'writer' ? 'Sem redator' : 'Sem cliente'"
+        size="sm"
+      />
+    </div>
+
     <!-- Primeira mídia do post -->
     <div class="relative aspect-square bg-surface-200/70 dark:bg-surface-900 overflow-hidden">
       <MediaImage
@@ -46,10 +56,15 @@
 import { computed } from 'vue'
 import StatusBadge from './StatusBadge.vue'
 import MediaImage from './MediaImage.vue'
+import UserChip from './UserChip.vue'
 import type { PostItem } from '@/types/api'
 import { Video, ImageOff, Layers } from '@lucide/vue'
 
-const props = defineProps<{ post: PostItem }>()
+const props = withDefaults(defineProps<{
+  post: PostItem
+  // Pessoa exibida no topo do card
+  person?: 'client' | 'writer'
+}>(), { person: 'client' })
 const emit = defineEmits<{ open: [post: PostItem] }>()
 
 const coverMedia = computed(() => {

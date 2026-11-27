@@ -12,6 +12,12 @@
         </button>
       </div>
 
+      <!-- Pessoas ligadas ao post -->
+      <div class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0">
+        <UserChip :user="selectedPostForDetail.client" label="Cliente" empty-text="Sem cliente" />
+        <UserChip :user="selectedPostForDetail.writer" label="Redator" empty-text="Sem redator" />
+      </div>
+
       <!-- Navigation Tabs -->
       <div class="flex border-b border-surface-200 dark:border-surface-700/80 px-6 bg-surface-100/70 dark:bg-surface-900/70 shrink-0 overflow-x-auto">
         <button
@@ -190,6 +196,7 @@ import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
 import { useMediaCache } from '@/composables/useMediaCache'
 import StatusBadge from './StatusBadge.vue'
+import UserChip from './UserChip.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
 import type { CommentItem, PostItem } from '@/types/api'
