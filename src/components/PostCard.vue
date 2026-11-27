@@ -44,6 +44,13 @@
         <StatusBadge :status="post.status" class="shrink-0" />
       </div>
       <p class="text-xs text-surface-600 dark:text-surface-300 line-clamp-3 whitespace-pre-line">{{ post.content }}</p>
+      <p
+        v-if="post.comments.length > 0"
+        class="inline-flex items-center gap-1 text-[11px] text-surface-500 dark:text-surface-400"
+        :title="`${post.comments.length} comentário(s)`"
+      >
+        <MessageCircle class="w-3.5 h-3.5" />{{ post.comments.length }} {{ post.comments.length === 1 ? 'comentário' : 'comentários' }}
+      </p>
 
       <div v-if="$slots.actions" class="mt-auto pt-3 border-t border-surface-200/80 dark:border-surface-700/80 flex items-center gap-2" @click.stop>
         <slot name="actions" />
@@ -58,7 +65,7 @@ import StatusBadge from './StatusBadge.vue'
 import MediaImage from './MediaImage.vue'
 import UserChip from './UserChip.vue'
 import type { PostItem } from '@/types/api'
-import { Video, ImageOff, Layers } from '@lucide/vue'
+import { Video, ImageOff, Layers, MessageCircle } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   post: PostItem

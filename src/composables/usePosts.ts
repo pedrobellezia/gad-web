@@ -179,6 +179,7 @@ export function usePosts() {
     try {
       const comment = await postsApi.createComment(postId, content)
       comments.value.push(comment)
+      posts.value.find(p => p.id === postId)?.comments.push(comment)
       showToast('Comentário publicado!', 'success')
       return comment
     } catch (err: any) {
@@ -191,6 +192,8 @@ export function usePosts() {
     try {
       await postsApi.deleteComment(postId, commentId)
       comments.value = comments.value.filter(c => c.id !== commentId)
+      const post = posts.value.find(p => p.id === postId)
+      if (post) post.comments = post.comments.filter(c => c.id !== commentId)
       showToast('Comentário removido.', 'info')
     } catch (err: any) {
       showToast(err.message || 'Erro ao remover comentário', 'error')
