@@ -63,64 +63,33 @@
           Você ainda não possui posts. Clique acima para criar um post de rascunho.
         </div>
 
-        <div v-else class="space-y-3">
-          <div
-            v-for="post in posts"
-            :key="post.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl p-5 border border-surface-200 dark:border-surface-700/80 flex items-center justify-between shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 transition"
-          >
-            <div class="flex-1 cursor-pointer min-w-0" @click="openPostDetailModal(post)">
-              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm hover:text-brand-600 dark:hover:text-brand-300 transition">{{ post.title }}</h4>
-                <StatusBadge :status="post.status" />
-                <span class="text-xs font-mono text-surface-500 dark:text-surface-400">v{{ post.version }}</span>
-              </div>
-              <p class="text-xs text-surface-600 dark:text-surface-300 line-clamp-1 mb-2">{{ post.content }}</p>
-              <div class="flex items-center gap-4 text-xs text-surface-500 dark:text-surface-400">
-                <span>{{ post.medias.length }} mídia(s) anexada(s)</span>
-                <span>{{ post.comments.length }} comentário(s)</span>
-                <span>Criado em {{ formatDate(post.created_at) }}</span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-2 shrink-0 ml-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <PostCard v-for="post in posts" :key="post.id" :post="post" @open="openPostDetailModal">
+            <template v-if="isMyPost(post) && !isFinal(post)" #actions>
               <button
                 v-if="post.status === 'draft'"
                 @click="sendToReview(post)"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
+                class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
               >
                 Enviar p/ Revisão
               </button>
-
               <button
-                v-if="post.status === 'approved'"
+                v-else-if="post.status === 'approved'"
                 @click="publishPost(post)"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 dark:bg-mint-600 dark:hover:bg-mint-700 text-white flex items-center gap-1.5 shadow-xs transition"
+                class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 dark:bg-mint-600 dark:hover:bg-mint-700 text-white inline-flex items-center justify-center gap-1.5 shadow-xs transition"
               >
-                <CheckCircle2 class="w-3.5 h-3.5" />
-                Publicar
+                <CheckCircle2 class="w-3.5 h-3.5" />Publicar
               </button>
-
+              <span v-else class="flex-1 text-xs text-surface-500 dark:text-surface-400">Aguardando o cliente</span>
               <button
-                v-if="post.status !== 'denied' && post.status !== 'published'"
-                @click="openEditPostModal(post)"
-                class="p-2 text-surface-500 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-300 rounded-lg hover:bg-surface-200/60 dark:hover:bg-surface-700/70 transition"
-                title="Editar post"
-              >
-                <Edit class="w-4 h-4" />
-              </button>
-
-              <button
-                v-if="post.status !== 'denied' && post.status !== 'published'"
                 @click="handleDelete(post.id)"
                 class="p-2 text-surface-500 dark:text-surface-400 hover:text-danger dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/15 transition"
                 title="Excluir post"
               >
                 <Trash2 class="w-4 h-4" />
               </button>
-            </div>
-          </div>
+            </template>
+          </PostCard>
         </div>
       </div>
 
@@ -203,7 +172,7 @@
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
 import { ref, onMounted } from 'vue'
-import StatusBadge from '@/components/StatusBadge.vue'
+import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
@@ -217,7 +186,7 @@ import { useTheme } from '@/composables/useTheme'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem } from '@/types/api'
-import { FileText, Building, User, Plus, Edit, Trash2, CheckCircle2, Sun, Moon } from '@lucide/vue'
+import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon } from '@lucide/vue'
 
 const { confirmDialog } = useDialog()
 const currentSection = ref('posts')
@@ -225,7 +194,7 @@ const currentSection = ref('posts')
 const { currentUser, logout, fetchProfile } = useAuth()
 const { posts, fetchPosts, updateStatus, deletePost } = usePosts()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
-const { openCreatePostModal, openEditPostModal, openPostDetailModal } = useModals()
+const { openCreatePostModal, openPostDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
@@ -304,11 +273,11 @@ async function handleDeactivate() {
   }
 }
 
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('pt-BR')
-  } catch {
-    return iso
-  }
+function isMyPost(post: PostItem): boolean {
+  return !!currentUser.value && post.writer_id === currentUser.value.id
+}
+
+function isFinal(post: PostItem): boolean {
+  return post.status === 'denied' || post.status === 'published'
 }
 </script>
