@@ -17,8 +17,22 @@
         v-if="selectedPostForDetail.client !== undefined || selectedPostForDetail.writer !== undefined"
         class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0"
       >
-        <UserChip v-if="selectedPostForDetail.client !== undefined" :user="selectedPostForDetail.client" label="Cliente" empty-text="Sem cliente" />
-        <UserChip v-if="selectedPostForDetail.writer !== undefined" :user="selectedPostForDetail.writer" label="Redator" empty-text="Sem redator" />
+        <UserChip
+          v-if="selectedPostForDetail.client !== undefined"
+          :user="selectedPostForDetail.client"
+          label="Cliente"
+          :empty-text="recordedName(selectedPostForDetail.published_client_name, 'Sem cliente')"
+        />
+        <UserChip
+          v-if="selectedPostForDetail.writer !== undefined"
+          :user="selectedPostForDetail.writer"
+          label="Redator"
+          :empty-text="recordedName(selectedPostForDetail.published_writer_name, 'Sem redator')"
+        />
+        <div v-if="selectedPostForDetail.published_at" class="leading-tight">
+          <p class="text-[10px] uppercase tracking-wider text-surface-500 dark:text-surface-400">Publicado em</p>
+          <p class="text-sm font-medium text-surface-800 dark:text-surface-100">{{ formatDate(selectedPostForDetail.published_at) }}</p>
+        </div>
       </div>
 
       <!-- Navigation Tabs -->
@@ -299,6 +313,10 @@ async function handleDeleteComment(commentId: string) {
 function canDeleteComment(cmt: CommentItem): boolean {
   if (!currentUser.value) return false
   return currentUser.value.type === 'agency' || currentUser.value.id === cmt.author_id
+}
+
+function recordedName(name: string | null | undefined, fallback: string): string {
+  return name ? `${name} (não vinculado)` : fallback
 }
 
 function formatDate(iso: string): string {
