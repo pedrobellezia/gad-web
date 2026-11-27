@@ -17,7 +17,7 @@
           >
             <option :value="null" class="bg-surface-50 dark:bg-surface-900 text-surface-500 dark:text-surface-400">{{ emptyLabel }}</option>
             <option v-for="opt in options" :key="opt.id" :value="opt.id" class="bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100">
-              {{ opt.name }} ({{ opt.email }})
+              {{ opt.name }}
             </option>
           </select>
           <p v-if="options.length === 0" class="text-xs text-surface-500 dark:text-surface-400 mt-1">
@@ -43,7 +43,6 @@ import { X } from '@lucide/vue'
 export interface MemberOption {
   id: string
   name: string
-  email: string
 }
 
 const props = defineProps<{

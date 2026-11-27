@@ -22,7 +22,7 @@
           <input
             v-model="search"
             type="search"
-            placeholder="Buscar cliente por nome ou e-mail..."
+            placeholder="Buscar cliente pelo nome..."
             class="w-full pl-9 pr-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
             @keydown.enter.prevent
           />
@@ -58,10 +58,7 @@
             <img v-if="avatarOf(cl)" :src="avatarOf(cl)" :alt="cl.user.name" class="w-full h-full object-cover" />
             <span v-else>{{ initials(cl.user.name) }}</span>
           </div>
-          <div class="flex-1 min-w-0 text-left">
-            <p class="text-sm font-medium text-surface-900 dark:text-surface-100 truncate">{{ cl.user.name }}</p>
-            <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ cl.user.email }}</p>
-          </div>
+          <p class="flex-1 min-w-0 text-left text-sm font-medium text-surface-900 dark:text-surface-100 truncate">{{ cl.user.name }}</p>
           <Check v-if="model === cl.user.id" class="w-4 h-4 text-brand-600 dark:text-brand-300 shrink-0" />
         </button>
 
@@ -99,9 +96,7 @@ function normalize(text: string): string {
 const filtered = computed(() => {
   const term = normalize(search.value.trim())
   if (!term) return props.clients
-  return props.clients.filter(cl =>
-    normalize(cl.user.name).includes(term) || normalize(cl.user.email).includes(term)
-  )
+  return props.clients.filter(cl => normalize(cl.user.name).includes(term))
 })
 
 function avatarPath(cl: ClientProfile): string | null {

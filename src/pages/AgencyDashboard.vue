@@ -276,7 +276,6 @@
               <div v-for="c in clients" :key="c.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ c.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ c.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(c.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -293,7 +292,6 @@
               <div v-for="w in writers" :key="w.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ w.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ w.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(w.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -310,7 +308,6 @@
               <div v-for="d in designers" :key="d.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ d.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ d.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(d.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -419,10 +416,10 @@ const assign = reactive({
   onConfirm: (async () => {}) as (id: string | null) => Promise<unknown>
 })
 
-type Member = { user: { id: string; name: string; email: string } }
+type Member = { user: { id: string; name: string } }
 
 function toOptions(members: Member[]): MemberOption[] {
-  return members.map(m => ({ id: m.user.id, name: m.user.name, email: m.user.email }))
+  return members.map(m => ({ id: m.user.id, name: m.user.name }))
 }
 
 function memberName(members: Member[], id: string | null): string {

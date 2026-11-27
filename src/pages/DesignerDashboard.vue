@@ -144,7 +144,6 @@
             <div>
               <span class="text-xs text-emerald-600 dark:text-mint-400 font-semibold tracking-wider uppercase block">Vinculado Atualmente</span>
               <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-500 dark:text-surface-400">{{ linkedAgency.user.email }}</p>
             </div>
           </div>
 

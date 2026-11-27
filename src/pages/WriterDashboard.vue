@@ -156,7 +156,7 @@
             <div>
               <span class="text-xs font-semibold text-emerald-600 dark:text-mint-400 uppercase tracking-wider">Vinculado à Agência</span>
               <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100 mt-1">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-500 dark:text-surface-400">CNPJ: {{ linkedAgency.cnpj }} · {{ linkedAgency.user.email }}</p>
+              <p class="text-xs text-surface-500 dark:text-surface-400">CNPJ: {{ linkedAgency.cnpj }}</p>
             </div>
             <button @click="handleSelfUnlink" class="btn-danger px-4 py-2 rounded-lg text-xs font-medium shrink-0">
               Desvincular-me
