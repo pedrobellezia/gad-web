@@ -13,9 +13,12 @@
       </div>
 
       <!-- Pessoas ligadas ao post -->
-      <div class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0">
-        <UserChip :user="selectedPostForDetail.client" label="Cliente" empty-text="Sem cliente" />
-        <UserChip :user="selectedPostForDetail.writer" label="Redator" empty-text="Sem redator" />
+      <div
+        v-if="selectedPostForDetail.client !== undefined || selectedPostForDetail.writer !== undefined"
+        class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0"
+      >
+        <UserChip v-if="selectedPostForDetail.client !== undefined" :user="selectedPostForDetail.client" label="Cliente" empty-text="Sem cliente" />
+        <UserChip v-if="selectedPostForDetail.writer !== undefined" :user="selectedPostForDetail.writer" label="Redator" empty-text="Sem redator" />
       </div>
 
       <!-- Navigation Tabs -->

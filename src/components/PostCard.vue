@@ -4,9 +4,9 @@
     @click="emit('open', post)"
   >
     <!-- Quem está ligado ao post (cliente, ou redator no painel do cliente) -->
-    <div class="px-3.5 py-2.5 border-b border-surface-200/80 dark:border-surface-700/80">
+    <div v-if="shownPerson !== undefined" class="px-3.5 py-2.5 border-b border-surface-200/80 dark:border-surface-700/80">
       <UserChip
-        :user="person === 'writer' ? post.writer : post.client"
+        :user="shownPerson"
         :label="person === 'writer' ? 'Redator' : 'Cliente'"
         :empty-text="person === 'writer' ? 'Sem redator' : 'Sem cliente'"
         size="sm"
@@ -66,6 +66,9 @@ const props = withDefaults(defineProps<{
   person?: 'client' | 'writer'
 }>(), { person: 'client' })
 const emit = defineEmits<{ open: [post: PostItem] }>()
+
+// undefined = API ainda sem o campo (não afirmar "Sem cliente"); null = realmente sem pessoa
+const shownPerson = computed(() => props.person === 'writer' ? props.post.writer : props.post.client)
 
 const coverMedia = computed(() => {
   if (props.post.medias.length === 0) return null
