@@ -52,6 +52,7 @@
             <p class="text-sm text-surface-500 dark:text-surface-400">Gerenciamento e envio de publicações para revisão</p>
           </div>
           <button
+            v-if="linkedAgency"
             @click="openCreatePostModal"
             class="btn-primary px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 shadow-sm"
           >
@@ -59,6 +60,19 @@
           </button>
         </div>
 
+        <!-- Sem agência: não há clientes nem biblioteca, então não dá para criar posts -->
+        <div v-if="agencyChecked && !linkedAgency" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl p-10 border border-surface-200 dark:border-surface-700/80 text-center max-w-xl mx-auto">
+          <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 border border-brand-100 dark:border-brand-500/25 flex items-center justify-center mx-auto mb-4">
+            <Building class="w-6 h-6" />
+          </div>
+          <h3 class="text-base font-semibold text-surface-900 dark:text-surface-100 mb-1">Vincule-se a uma agência para começar</h3>
+          <p class="text-sm text-surface-500 dark:text-surface-400 mb-5">Os posts são feitos para os clientes de uma agência. Peça um token de convite à agência e use-o na aba de vínculo.</p>
+          <button @click="currentSection = 'agency'" class="btn-primary px-5 py-2.5 rounded-lg text-sm font-medium inline-flex items-center gap-2">
+            <Building class="w-4 h-4" />Inserir token de convite
+          </button>
+        </div>
+
+        <template v-else-if="linkedAgency">
         <!-- Resumo dos meus posts -->
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
           <button
@@ -144,6 +158,7 @@
             </template>
           </PostCard>
         </div>
+        </template>
       </div>
 
       <!-- Section: Agency Link -->
@@ -254,12 +269,14 @@ const { isDark, toggleTheme } = useTheme()
 const profileName = ref('')
 const profileEmail = ref('')
 const tokenInput = ref('')
+// Evita mostrar o aviso de "sem agência" antes de a consulta terminar
+const agencyChecked = ref(false)
 
 onMounted(async () => {
   await Promise.all([
     fetchProfile().catch(() => {}),
     fetchPosts().catch(() => {}),
-    fetchMyAgency().catch(() => {})
+    fetchMyAgency().catch(() => {}).finally(() => { agencyChecked.value = true })
   ])
   if (currentUser.value) {
     profileName.value = currentUser.value.name
