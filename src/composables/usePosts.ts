@@ -7,6 +7,7 @@ import {
 } from '@/api/posts'
 import type { PostItem, PostStatus, CommentItem } from '@/types/api'
 import { useToast } from './useToast'
+import { useModals } from './useModals'
 
 const posts = ref<PostItem[]>([])
 const currentPost = ref<PostItem | null>(null)
@@ -24,6 +25,7 @@ const statusLabels: Record<PostStatus, string> = {
 
 export function usePosts() {
   const { showToast } = useToast()
+  const { selectedPostForDetail } = useModals()
 
   const filteredPosts = computed(() => {
     if (activeFilter.value === 'all') return posts.value
@@ -45,6 +47,23 @@ export function usePosts() {
       throw err
     } finally {
       isLoading.value = false
+    }
+  }
+
+  // Atualização em segundo plano: sem loading nem toast, e só troca a lista se algo mudou
+  async function refreshPostsSilently(params?: PostFilterParams) {
+    try {
+      const data = await postsApi.getPosts(params)
+      if (JSON.stringify(data) === JSON.stringify(posts.value)) return
+      posts.value = data
+      // Mantém a visão detalhada aberta em dia (ex.: cliente aprovou enquanto o redator olhava)
+      const open = selectedPostForDetail.value
+      if (open) {
+        const fresh = data.find(p => p.id === open.id)
+        if (fresh && fresh.version !== open.version) selectedPostForDetail.value = fresh
+      }
+    } catch {
+      // Silencioso: a próxima tentativa ou a ação do usuário mostram o erro
     }
   }
 
@@ -160,6 +179,7 @@ export function usePosts() {
     try {
       const comment = await postsApi.createComment(postId, content)
       comments.value.push(comment)
+      posts.value.find(p => p.id === postId)?.comments.push(comment)
       showToast('Comentário publicado!', 'success')
       return comment
     } catch (err: any) {
@@ -172,6 +192,8 @@ export function usePosts() {
     try {
       await postsApi.deleteComment(postId, commentId)
       comments.value = comments.value.filter(c => c.id !== commentId)
+      const post = posts.value.find(p => p.id === postId)
+      if (post) post.comments = post.comments.filter(c => c.id !== commentId)
       showToast('Comentário removido.', 'info')
     } catch (err: any) {
       showToast(err.message || 'Erro ao remover comentário', 'error')
@@ -188,6 +210,7 @@ export function usePosts() {
     isLoading,
     setFilter,
     fetchPosts,
+    refreshPostsSilently,
     getPost,
     createPost,
     updatePost,

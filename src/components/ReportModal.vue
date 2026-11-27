@@ -12,7 +12,7 @@
           >
             <option value="" class="bg-surface-50 dark:bg-surface-900 text-surface-500 dark:text-surface-400">Selecione o cliente...</option>
             <option v-for="c in clients" :key="c.id" :value="c.id" class="bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100">
-              {{ c.user.name }} ({{ c.user.email }})
+              {{ c.user.name }}
             </option>
           </select>
           <p v-if="clients.length === 0" class="text-xs text-surface-500 dark:text-surface-400 mt-1">

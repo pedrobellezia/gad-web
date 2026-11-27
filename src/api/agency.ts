@@ -1,9 +1,7 @@
 import { apiFetch } from './client'
 import type {
-  Agency,
-  ClientProfile,
-  WriterProfile,
-  DesignerProfile,
+  AgencyPublic,
+  AgencyMember,
   InviteTokenItem,
   DetailsResponse
 } from '@/types/api'
@@ -29,15 +27,15 @@ export const agencyApi = {
 
   // Members lists
   getClients() {
-    return apiFetch<ClientProfile[]>('/agency/clients')
+    return apiFetch<AgencyMember[]>('/agency/clients')
   },
 
   getWriters() {
-    return apiFetch<WriterProfile[]>('/agency/writers')
+    return apiFetch<AgencyMember[]>('/agency/writers')
   },
 
   getDesigners() {
-    return apiFetch<DesignerProfile[]>('/agency/designers')
+    return apiFetch<AgencyMember[]>('/agency/designers')
   },
 
   unlinkMember(userId: string) {
@@ -61,6 +59,6 @@ export const agencyApi = {
   },
 
   getMyAgency() {
-    return apiFetch<Agency>('/agency/my')
+    return apiFetch<AgencyPublic>('/agency/my')
   }
 }

@@ -92,59 +92,23 @@
           <p class="text-xs text-surface-500 dark:text-surface-400">Não há nenhuma publicação aguardando sua revisão no momento.</p>
         </div>
 
-        <div v-else class="space-y-4">
-          <div
-            v-for="post in pendingReviewPosts"
-            :key="post.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 transition"
-          >
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <h3 class="font-bold text-surface-900 dark:text-surface-100 text-base">{{ post.title }}</h3>
-                <StatusBadge :status="post.status" />
-              </div>
-              <span class="text-xs text-surface-500 dark:text-surface-400">{{ formatDate(post.created_at) }}</span>
-            </div>
-
-            <p class="text-sm text-surface-600 dark:text-surface-300 mb-4 whitespace-pre-line leading-relaxed">
-              {{ post.content }}
-            </p>
-
-            <div class="flex flex-wrap items-center gap-4 text-xs text-surface-500 dark:text-surface-400 mb-4 py-2 border-y border-surface-200/70 dark:border-surface-700/70">
-              <span class="font-medium text-surface-700 dark:text-surface-200">Versão: v{{ post.version }}</span>
-              <span>•</span>
-              <span>Criado em: {{ formatDate(post.created_at) }}</span>
-              <span>•</span>
-              <span>{{ post.medias?.length || 0 }} mídias anexadas</span>
-            </div>
-
-            <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <PostCard v-for="post in pendingReviewPosts" :key="post.id" :post="post" person="writer" @open="openPostDetailModal">
+            <template #actions>
               <button
-                @click="openPostDetailModal(post)"
-                class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
+                @click="openApprovalModal(post, 'approve')"
+                class="btn-success flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1.5"
               >
-                <Eye class="w-3.5 h-3.5" />
-                <span>Ver Mídias & Comentários</span>
+                <Check class="w-3.5 h-3.5" />Aprovar
               </button>
-
-              <div class="flex items-center gap-2">
-                <button
-                  @click="openApprovalModal(post, 'approve')"
-                  class="btn-success px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-                >
-                  <Check class="w-4 h-4" />
-                  <span>Aprovar Post</span>
-                </button>
-                <button
-                  @click="openApprovalModal(post, 'deny')"
-                  class="btn-danger px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5"
-                >
-                  <X class="w-4 h-4" />
-                  <span>Rejeitar / Ajustes</span>
-                </button>
-              </div>
-            </div>
-          </div>
+              <button
+                @click="openApprovalModal(post, 'deny')"
+                class="btn-danger flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center justify-center gap-1.5"
+              >
+                <X class="w-3.5 h-3.5" />Reprovar
+              </button>
+            </template>
+          </PostCard>
         </div>
       </div>
 
@@ -159,25 +123,8 @@
           <p class="text-sm text-surface-500 dark:text-surface-400">Nenhum post no histórico até o momento.</p>
         </div>
 
-        <div v-else class="space-y-3">
-          <div
-            v-for="post in historyPosts"
-            :key="post.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 p-5 shadow-xs dark:shadow-card-dark flex items-center justify-between cursor-pointer hover:border-surface-300 dark:hover:border-surface-600 transition"
-            @click="openPostDetailModal(post)"
-          >
-            <div>
-              <div class="flex items-center gap-2.5 mb-1">
-                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm">{{ post.title }}</h4>
-                <StatusBadge :status="post.status" />
-              </div>
-              <p class="text-xs text-surface-500 dark:text-surface-400 line-clamp-1 max-w-xl">{{ post.content }}</p>
-            </div>
-            <div class="text-right">
-              <span class="text-xs text-surface-500 dark:text-surface-400 block">{{ formatDate(post.created_at) }}</span>
-              <span class="text-[11px] text-brand-600 dark:text-brand-400 font-medium">Ver detalhes →</span>
-            </div>
-          </div>
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <PostCard v-for="post in historyPosts" :key="post.id" :post="post" person="writer" @open="openPostDetailModal" />
         </div>
       </div>
 
@@ -196,7 +143,6 @@
             <div>
               <span class="text-xs text-mint-600 dark:text-mint-400 font-semibold tracking-wider uppercase block">Agência Vinculada</span>
               <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-500 dark:text-surface-400">{{ linkedAgency.user.email }}</p>
             </div>
           </div>
 
@@ -327,13 +273,14 @@ import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
-import type { Agency } from '@/types/api'
-import StatusBadge from '@/components/StatusBadge.vue'
+import type { AgencyPublic } from '@/types/api'
+import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import ApprovalModal from '@/components/ApprovalModal.vue'
@@ -345,7 +292,6 @@ import {
   Building2,
   User,
   RefreshCw,
-  Eye,
   Check,
   X,
   Key,
@@ -357,14 +303,15 @@ import {
 
 const { confirmDialog } = useDialog()
 const { user, logout, fetchProfile } = useAuth()
-const { posts, isLoading, fetchPosts } = usePosts()
+const { posts, isLoading, fetchPosts, refreshPostsSilently } = usePosts()
+useAutoRefresh(() => refreshPostsSilently())
 const { openApprovalModal, openPostDetailModal, openChangePasswordModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
 const currentSection = ref<'posts' | 'history' | 'agency' | 'profile'>('posts')
 const profileName = ref('')
-const linkedAgency = ref<Agency | null>(null)
+const linkedAgency = ref<AgencyPublic | null>(null)
 const tokenInput = ref('')
 const linking = ref(false)
 const unlinking = ref(false)
@@ -450,14 +397,6 @@ async function handleDeactivateAccount() {
     logout()
   } catch (err: any) {
     showToast(err.message || 'Erro ao desativar conta', 'error')
-  }
-}
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('pt-BR')
-  } catch {
-    return iso
   }
 }
 </script>

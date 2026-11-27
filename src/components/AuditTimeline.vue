@@ -37,7 +37,6 @@
 
           <div class="flex items-center gap-1.5 text-xs text-surface-500 dark:text-surface-400 pt-1.5 border-t border-surface-200/80 dark:border-surface-700/80">
             <span class="font-medium text-surface-700 dark:text-surface-200">{{ log.actor_name || 'Sistema' }}</span>
-            <span v-if="log.actor_email" class="text-surface-500 dark:text-surface-400">({{ log.actor_email }})</span>
           </div>
         </div>
       </div>

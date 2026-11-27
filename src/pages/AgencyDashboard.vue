@@ -128,66 +128,33 @@
           Nenhum post encontrado com o filtro selecionado.
         </div>
 
-        <div v-else class="space-y-3">
-          <div
-            v-for="post in filteredPosts"
-            :key="post.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl p-5 border border-surface-200 dark:border-surface-700/80 flex items-center justify-between shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 transition"
-          >
-            <div class="flex-1 cursor-pointer min-w-0" @click="openPostDetailModal(post)">
-              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm hover:text-brand-600 dark:hover:text-brand-300 transition">{{ post.title }}</h4>
-                <StatusBadge :status="post.status" />
-                <span class="text-xs font-mono text-surface-500 dark:text-surface-400">v{{ post.version }}</span>
-              </div>
-              <p class="text-xs text-surface-600 dark:text-surface-300 line-clamp-1 mb-2">{{ post.content }}</p>
-              <div class="flex items-center gap-4 text-xs text-surface-500 dark:text-surface-400">
-                <span>Cliente: {{ memberName(clients, post.client_id) }}</span>
-                <span>Redator: {{ memberName(writers, post.writer_id) }}</span>
-                <span>{{ post.medias.length }} mídia(s)</span>
-                <span>{{ post.comments.length }} comentário(s)</span>
-                <span>Atualizado em {{ formatDate(post.updated_at) }}</span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-2 shrink-0 ml-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <PostCard v-for="post in filteredPosts" :key="post.id" :post="post" @open="openPostDetailModal">
+            <template v-if="post.status !== 'denied' && post.status !== 'published'" #actions>
               <button
-                v-if="post.status !== 'denied' && post.status !== 'published'"
-                @click="openAssignWriter(post)"
-                class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium"
-                title="Trocar Redator"
+                v-if="post.status === 'draft'"
+                @click="sendToReview(post)"
+                class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
               >
-                Trocar Redator
+                Enviar p/ Revisão
               </button>
-
               <button
-                v-if="post.status === 'approved'"
+                v-else-if="post.status === 'approved'"
                 @click="publishPost(post)"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 dark:bg-mint-600 dark:hover:bg-mint-700 text-white transition"
+                class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 dark:bg-mint-600 dark:hover:bg-mint-700 text-white transition shadow-xs"
               >
-                Publicar Post
+                Publicar
               </button>
-
+              <span v-else class="flex-1 text-xs text-surface-500 dark:text-surface-400">Aguardando o cliente</span>
               <button
-                v-if="post.status !== 'denied' && post.status !== 'published'"
-                @click="openEditPostModal(post)"
-                class="p-2 text-surface-500 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-300 rounded-lg hover:bg-surface-200/60 dark:hover:bg-surface-700/70 transition"
-                title="Editar post"
-              >
-                <Edit class="w-4 h-4" />
-              </button>
-
-              <button
-                v-if="post.status !== 'denied' && post.status !== 'published'"
                 @click="handleDeletePost(post.id)"
                 class="p-2 text-surface-500 dark:text-surface-400 hover:text-danger dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/15 transition"
                 title="Excluir post"
               >
                 <Trash2 class="w-4 h-4" />
               </button>
-            </div>
-          </div>
+            </template>
+          </PostCard>
         </div>
       </div>
 
@@ -309,7 +276,6 @@
               <div v-for="c in clients" :key="c.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ c.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ c.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(c.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -326,7 +292,6 @@
               <div v-for="w in writers" :key="w.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ w.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ w.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(w.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -343,7 +308,6 @@
               <div v-for="d in designers" :key="d.user.id" class="p-4 bg-surface-50 dark:bg-surface-800/85 border border-surface-200 dark:border-surface-700/80 rounded-xl flex items-center justify-between shadow-xs dark:shadow-card-dark">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-surface-900 dark:text-surface-100 truncate">{{ d.user.name }}</p>
-                  <p class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ d.user.email }}</p>
                 </div>
                 <button @click="handleUnlink(d.user.id)" class="btn-danger px-2.5 py-1 rounded text-xs font-medium shrink-0 ml-2">Desvincular</button>
               </div>
@@ -356,7 +320,7 @@
     <!-- Modals -->
     <CreatePostModal />
     <EditPostModal />
-    <PostDetailModal />
+    <PostDetailModal @change-writer="openAssignWriter" />
     <AssignMemberModal
       :open="assign.open"
       :title="assign.title"
@@ -374,7 +338,7 @@
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
 import { ref, reactive, onMounted } from 'vue'
-import StatusBadge from '@/components/StatusBadge.vue'
+import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
@@ -382,6 +346,7 @@ import PostDetailModal from '@/components/PostDetailModal.vue'
 import AssignMemberModal, { type MemberOption } from '@/components/AssignMemberModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useMedia } from '@/composables/useMedia'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
@@ -407,10 +372,11 @@ const filterOptions = [
 ]
 
 const { fetchProfile } = useAuth()
-const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, updateStatus, updateWriter, deletePost } = usePosts()
+const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, updateWriter, deletePost } = usePosts()
+useAutoRefresh(() => refreshPostsSilently())
 const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
-const { openEditPostModal, openPostDetailModal } = useModals()
+const { openPostDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
@@ -426,6 +392,14 @@ onMounted(async () => {
 
 function countStatus(st: string): number {
   return posts.value.filter(p => p.status === st).length
+}
+
+async function sendToReview(post: PostItem) {
+  if (post.medias.length === 0) {
+    showToast('O post precisa de pelo menos 1 mídia anexada para entrar em revisão!', 'error')
+    return
+  }
+  await updateStatus(post.id, 'review', post.version)
 }
 
 async function publishPost(post: PostItem) {
@@ -444,10 +418,10 @@ const assign = reactive({
   onConfirm: (async () => {}) as (id: string | null) => Promise<unknown>
 })
 
-type Member = { user: { id: string; name: string; email: string } }
+type Member = { user: { id: string; name: string } }
 
 function toOptions(members: Member[]): MemberOption[] {
-  return members.map(m => ({ id: m.user.id, name: m.user.name, email: m.user.email }))
+  return members.map(m => ({ id: m.user.id, name: m.user.name }))
 }
 
 function memberName(members: Member[], id: string | null): string {
@@ -521,13 +495,5 @@ async function handleDeleteToken(tokenStr: string) {
 async function handleUnlink(userId: string) {
   if (!(await confirmDialog({ title: 'Desvincular membro', message: 'Deseja realmente desvincular este membro da agência?', confirmLabel: 'Desvincular', danger: true }))) return
   await unlinkMember(userId)
-}
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('pt-BR')
-  } catch {
-    return iso
-  }
 }
 </script>
