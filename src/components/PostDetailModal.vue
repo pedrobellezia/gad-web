@@ -190,6 +190,14 @@
             <UserCog class="w-4 h-4" />Trocar redator
           </button>
           <button
+            v-if="isWriter"
+            @click="duplicateAsDraft(selectedPostForDetail)"
+            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
+            title="Criar um rascunho novo com o conteúdo deste post"
+          >
+            <Copy class="w-4 h-4" />Duplicar como rascunho
+          </button>
+          <button
             v-if="canManagePost && !isFinalStatus"
             @click="handleEdit"
             class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
@@ -212,12 +220,13 @@ import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
 import { useMediaCache } from '@/composables/useMediaCache'
+import { usePostDuplication } from '@/composables/usePostDuplication'
 import StatusBadge from './StatusBadge.vue'
 import UserChip from './UserChip.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
 import type { CommentItem, PostItem } from '@/types/api'
-import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog } from '@lucide/vue'
+import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog, Copy } from '@lucide/vue'
 
 const emit = defineEmits<{ 'change-writer': [post: PostItem] }>()
 
@@ -226,6 +235,7 @@ const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal, openEd
 const { comments, fetchComments, addComment, removeComment, updateStatus } = usePosts()
 const { currentUser, userAvatarUrl } = useAuth()
 const { getAvatarUrl, loadAvatar } = useMediaCache()
+const { duplicateAsDraft } = usePostDuplication()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')
@@ -239,6 +249,8 @@ const isWriterOwner = computed(() =>
   currentUser.value?.type === 'writer' && selectedPostForDetail.value?.writer_id === currentUser.value.id
 )
 const canManagePost = computed(() => isAgencyOwner.value || isWriterOwner.value)
+// Só redatores criam posts (RN-14), então só eles duplicam
+const isWriter = computed(() => currentUser.value?.type === 'writer')
 const isFinalStatus = computed(() =>
   selectedPostForDetail.value?.status === 'denied' || selectedPostForDetail.value?.status === 'published'
 )

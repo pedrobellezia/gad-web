@@ -136,9 +136,10 @@
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           <PostCard v-for="post in filteredPosts" :key="post.id" :post="post" @open="openPostDetailModal">
-            <template v-if="post.status !== 'denied' && post.status !== 'published'" #actions>
+            <template v-if="post.status !== 'published'" #actions>
+              <span v-if="post.status === 'denied'" class="flex-1 text-xs text-surface-500 dark:text-surface-400">Reprovado pelo cliente</span>
               <button
-                v-if="post.status === 'draft'"
+                v-else-if="post.status === 'draft'"
                 @click="sendToReview(post)"
                 class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
               >

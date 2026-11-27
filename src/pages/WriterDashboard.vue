@@ -53,7 +53,7 @@
           </div>
           <button
             v-if="linkedAgency"
-            @click="openCreatePostModal"
+            @click="openCreatePostModal()"
             class="btn-primary px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 shadow-sm"
           >
             <Plus class="w-4 h-4" />Criar Novo Post
@@ -132,9 +132,17 @@
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
           <PostCard v-for="post in visiblePosts" :key="post.id" :post="post" @open="openPostDetailModal">
-            <template v-if="isMyPost(post) && !isFinal(post)" #actions>
+            <template v-if="(isMyPost(post) && !isFinal(post)) || post.status === 'denied'" #actions>
               <button
-                v-if="post.status === 'draft'"
+                v-if="post.status === 'denied'"
+                @click="duplicateAsDraft(post)"
+                class="flex-1 btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center justify-center gap-1.5"
+                title="Criar um rascunho novo com o conteúdo deste post"
+              >
+                <Copy class="w-3.5 h-3.5" />Duplicar como rascunho
+              </button>
+              <button
+                v-else-if="post.status === 'draft'"
                 @click="sendToReview(post)"
                 class="flex-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition shadow-xs"
               >
@@ -149,6 +157,7 @@
               </button>
               <span v-else class="flex-1 text-xs text-surface-500 dark:text-surface-400">Aguardando o cliente</span>
               <button
+                v-if="isMyPost(post)"
                 @click="handleDelete(post.id)"
                 class="p-2 text-surface-500 dark:text-surface-400 hover:text-danger dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/15 transition"
                 title="Excluir post"
@@ -249,13 +258,14 @@ import PostDetailModal from '@/components/PostDetailModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
+import { usePostDuplication } from '@/composables/usePostDuplication'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
 import { useTheme } from '@/composables/useTheme'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem, PostStatus } from '@/types/api'
-import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, PenLine, Clock, XCircle, Send } from '@lucide/vue'
+import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, PenLine, Clock, XCircle, Send, Copy } from '@lucide/vue'
 
 const { confirmDialog } = useDialog()
 const currentSection = ref('posts')
@@ -263,6 +273,7 @@ const currentSection = ref('posts')
 const { currentUser, logout, fetchProfile } = useAuth()
 const { posts, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
 useAutoRefresh(() => refreshPostsSilently())
+const { duplicateAsDraft } = usePostDuplication()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
 const { openCreatePostModal, openPostDetailModal } = useModals()
 const { showToast } = useToast()

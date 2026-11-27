@@ -18,8 +18,18 @@ const selectedMediaForEdit = ref<MediaItem | null>(null)
 const selectedMediaForDetail = ref<MediaItem | null>(null)
 const currentApprovalAction = ref<'approve' | 'deny'>('approve')
 
+// Dados iniciais do modal de criação (ex.: duplicar um post como rascunho)
+export interface CreatePostPrefill {
+  title: string
+  content: string
+  client_id: string | null
+  medias: { media_id: string; position: number }[]
+}
+const createPostPrefill = ref<CreatePostPrefill | null>(null)
+
 export function useModals() {
-  function openCreatePostModal() {
+  function openCreatePostModal(prefill?: CreatePostPrefill) {
+    createPostPrefill.value = prefill ?? null
     createPostModalOpen.value = true
   }
   function closeCreatePostModal() {
@@ -93,6 +103,7 @@ export function useModals() {
 
   return {
     createPostModalOpen,
+    createPostPrefill,
     editPostModalOpen,
     approvalModalOpen,
     changePasswordModalOpen,
