@@ -26,12 +26,6 @@
           <LayoutDashboard class="w-4 h-4" />Visão Geral
         </button>
         <button
-          @click="currentSection = 'posts'"
-          :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'posts' }]"
-        >
-          <FileText class="w-4 h-4" />Todos os Posts
-        </button>
-        <button
           @click="currentSection = 'medias'"
           :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'medias' }]"
         >
@@ -80,7 +74,7 @@
       </div>
 
       <!-- Section: Posts -->
-      <div v-if="currentSection === 'posts' || currentSection === 'overview'" class="fade-in mb-8">
+      <div v-if="currentSection === 'overview'" class="fade-in mb-8">
         <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h2 class="text-lg font-bold text-surface-900 dark:text-surface-50">Lista de Publicações</h2>
           <div class="flex flex-wrap gap-1.5 bg-surface-50 dark:bg-surface-800/90 border border-surface-200 dark:border-surface-700/80 p-1 rounded-lg text-xs">
@@ -331,7 +325,7 @@ import type { PostItem, MediaItem, PostStatus } from '@/types/api'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
-  LayoutDashboard, FileText, Image, Key, Users, Activity,
+  LayoutDashboard, Image, Key, Users, Activity,
   Plus, Edit, Trash2, Sun, Moon
 } from '@lucide/vue'
 
