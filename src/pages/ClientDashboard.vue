@@ -273,6 +273,7 @@ import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
@@ -302,7 +303,8 @@ import {
 
 const { confirmDialog } = useDialog()
 const { user, logout, fetchProfile } = useAuth()
-const { posts, isLoading, fetchPosts } = usePosts()
+const { posts, isLoading, fetchPosts, refreshPostsSilently } = usePosts()
+useAutoRefresh(() => refreshPostsSilently())
 const { openApprovalModal, openPostDetailModal, openChangePasswordModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()

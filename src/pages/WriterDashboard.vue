@@ -248,6 +248,7 @@ import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
 import { useTheme } from '@/composables/useTheme'
@@ -260,7 +261,8 @@ const { confirmDialog } = useDialog()
 const currentSection = ref('posts')
 
 const { currentUser, logout, fetchProfile } = useAuth()
-const { posts, fetchPosts, updateStatus, deletePost } = usePosts()
+const { posts, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
+useAutoRefresh(() => refreshPostsSilently())
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
 const { openCreatePostModal, openPostDetailModal } = useModals()
 const { showToast } = useToast()

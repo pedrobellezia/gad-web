@@ -346,6 +346,7 @@ import PostDetailModal from '@/components/PostDetailModal.vue'
 import AssignMemberModal, { type MemberOption } from '@/components/AssignMemberModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
+import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useMedia } from '@/composables/useMedia'
 import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
@@ -371,7 +372,8 @@ const filterOptions = [
 ]
 
 const { fetchProfile } = useAuth()
-const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, updateStatus, updateWriter, deletePost } = usePosts()
+const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, updateWriter, deletePost } = usePosts()
+useAutoRefresh(() => refreshPostsSilently())
 const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
 const { openPostDetailModal } = useModals()
