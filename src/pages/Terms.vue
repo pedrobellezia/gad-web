@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full flex flex-col bg-surface-100/70 dark:bg-surface-900 text-surface-800 dark:text-surface-100 antialiased transition-colors duration-200">
+  <div class="flex-1 flex flex-col bg-surface-100/70 dark:bg-surface-900 text-surface-800 dark:text-surface-100 antialiased transition-colors duration-200">
     <Navbar />
 
     <main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12 md:py-16">
