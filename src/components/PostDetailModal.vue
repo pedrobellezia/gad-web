@@ -146,13 +146,37 @@
       </div>
 
       <!-- Footer Actions -->
-      <div class="p-4 border-t border-surface-200 dark:border-surface-700/80 bg-surface-100/70 dark:bg-surface-900/70 flex items-center justify-between shrink-0">
+      <div class="p-4 border-t border-surface-200 dark:border-surface-700/80 bg-surface-100/70 dark:bg-surface-900/70 flex items-center justify-between gap-3 flex-wrap shrink-0">
         <div class="text-xs text-surface-500 dark:text-surface-400">
           Versão do Post: <strong class="text-surface-700 dark:text-surface-200">{{ selectedPostForDetail.version }}</strong>
         </div>
-        <button @click="closePostDetailModal" class="btn-secondary px-5 py-2 rounded-lg text-sm font-medium">
-          Fechar
-        </button>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            v-if="canManagePost && canReturnToDraft"
+            @click="handleReturnToDraft"
+            :disabled="isChangingStatus"
+            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <Undo2 class="w-4 h-4" />Voltar para rascunho
+          </button>
+          <button
+            v-if="isAgencyOwner && !isFinalStatus"
+            @click="handleChangeWriter"
+            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
+          >
+            <UserCog class="w-4 h-4" />Trocar redator
+          </button>
+          <button
+            v-if="canManagePost && !isFinalStatus"
+            @click="handleEdit"
+            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
+          >
+            <Edit class="w-4 h-4" />Editar
+          </button>
+          <button @click="closePostDetailModal" class="btn-secondary px-5 py-2 rounded-lg text-sm font-medium">
+            Fechar
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -160,7 +184,7 @@
 
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
 import { useAuth } from '@/composables/useAuth'
@@ -168,22 +192,73 @@ import { useMediaCache } from '@/composables/useMediaCache'
 import StatusBadge from './StatusBadge.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
-import type { CommentItem } from '@/types/api'
-import { X, FileText, MessageCircle, History, Video, Send, Trash2 } from '@lucide/vue'
+import type { CommentItem, PostItem } from '@/types/api'
+import { X, FileText, MessageCircle, History, Video, Send, Trash2, Undo2, Edit, UserCog } from '@lucide/vue'
+
+const emit = defineEmits<{ 'change-writer': [post: PostItem] }>()
 
 const { confirmDialog } = useDialog()
-const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal } = useModals()
-const { comments, fetchComments, addComment, removeComment } = usePosts()
+const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal, openEditPostModal } = useModals()
+const { comments, fetchComments, addComment, removeComment, updateStatus } = usePosts()
 const { currentUser, userAvatarUrl } = useAuth()
 const { getAvatarUrl, loadAvatar } = useMediaCache()
 
 const activeTab = ref<'content' | 'comments' | 'history'>('content')
 const newComment = ref('')
+const isChangingStatus = ref(false)
 
-watch(selectedPostForDetail, (post) => {
-  if (post) {
+// RN-15/RN-18: só a agência dona do post e o redator autor manipulam o post
+const isAgencyOwner = computed(() =>
+  currentUser.value?.type === 'agency' && selectedPostForDetail.value?.agency_id === currentUser.value.id
+)
+const isWriterOwner = computed(() =>
+  currentUser.value?.type === 'writer' && selectedPostForDetail.value?.writer_id === currentUser.value.id
+)
+const canManagePost = computed(() => isAgencyOwner.value || isWriterOwner.value)
+const isFinalStatus = computed(() =>
+  selectedPostForDetail.value?.status === 'denied' || selectedPostForDetail.value?.status === 'published'
+)
+const canReturnToDraft = computed(() =>
+  selectedPostForDetail.value?.status === 'review' || selectedPostForDetail.value?.status === 'approved'
+)
+
+async function handleReturnToDraft() {
+  const post = selectedPostForDetail.value
+  if (!post) return
+  const ok = await confirmDialog({
+    title: 'Voltar para rascunho',
+    message: `O post "${post.title}" sairá de ${post.status === 'review' ? 'revisão' : 'aprovado'} e voltará para rascunho.`,
+    confirmLabel: 'Voltar para rascunho'
+  })
+  if (!ok) return
+  isChangingStatus.value = true
+  try {
+    selectedPostForDetail.value = await updateStatus(post.id, 'draft', post.version)
+  } catch {
+    // erro já exibido via toast
+  } finally {
+    isChangingStatus.value = false
+  }
+}
+
+function handleEdit() {
+  const post = selectedPostForDetail.value
+  if (!post) return
+  closePostDetailModal()
+  openEditPostModal(post)
+}
+
+function handleChangeWriter() {
+  const post = selectedPostForDetail.value
+  if (!post) return
+  closePostDetailModal()
+  emit('change-writer', post)
+}
+
+watch(() => selectedPostForDetail.value?.id, (postId) => {
+  if (postId) {
     activeTab.value = 'content'
-    fetchComments(post.id).catch(() => {})
+    fetchComments(postId).catch(() => {})
   }
 })
 
