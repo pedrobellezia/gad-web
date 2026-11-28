@@ -28,12 +28,13 @@ export function useAgencyMembers() {
     }
   }
 
-  async function createTokens(quantity: number) {
+  // Retorna os tokens que não existiam antes (a API só responde com uma mensagem)
+  async function createTokens(quantity: number): Promise<string[]> {
     try {
-      const res = await agencyApi.createInviteTokens(quantity)
-      showToast(res.details || `${quantity} token(s) gerado(s)!`, 'success')
+      const before = new Set(tokens.value.map(t => t.token))
+      await agencyApi.createInviteTokens(quantity)
       await fetchTokens()
-      return res
+      return tokens.value.map(t => t.token).filter(token => !before.has(token))
     } catch (err: any) {
       showToast(err.message || 'Erro ao gerar tokens', 'error')
       throw err
