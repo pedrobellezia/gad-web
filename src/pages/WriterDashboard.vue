@@ -26,6 +26,12 @@
           <FileText class="w-4 h-4" />Meus Posts
         </button>
         <button
+          @click="openLibrary"
+          :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'medias' }]"
+        >
+          <Image class="w-4 h-4" />Biblioteca de Mídias
+        </button>
+        <button
           @click="currentSection = 'agency'"
           :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'agency' }]"
         >
@@ -154,6 +160,28 @@
       </div>
 
       <!-- Section: Agency Link -->
+      <!-- Biblioteca da agência, só para consulta (edição fica com a agência e o designer) -->
+      <div v-if="currentSection === 'medias'" class="fade-in">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-surface-900 dark:text-surface-50">Biblioteca de Mídias</h2>
+        </div>
+        <MediaLibraryGrid
+          :medias="medias"
+          :empty-text="linkedAgency ? 'Nenhuma mídia enviada ainda para esta agência.' : 'Vincule-se a uma agência para ver a biblioteca de mídias.'"
+        >
+          <template #actions="{ media }">
+            <button
+              type="button"
+              @click="openMediaDetailModal(media)"
+              class="p-1.5 -mr-1 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition shrink-0"
+              title="Detalhes da mídia"
+            >
+              <Menu class="w-4 h-4" />
+            </button>
+          </template>
+        </MediaLibraryGrid>
+      </div>
+
       <div v-if="currentSection === 'agency'" class="fade-in max-w-xl">
         <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-50 mb-2">Vínculo com Agência</h2>
         <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Redatores vinculados podem criar posts e acessar a biblioteca da agência</p>
@@ -229,6 +257,7 @@
     <CreatePostModal />
     <EditPostModal />
     <PostDetailModal />
+    <MediaDetailModal />
   </div>
 </template>
 
@@ -251,7 +280,10 @@ import { useTheme } from '@/composables/useTheme'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem, PostStatus } from '@/types/api'
-import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy } from '@lucide/vue'
+import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy, Image, Menu } from '@lucide/vue'
+import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
+import MediaDetailModal from '@/components/MediaDetailModal.vue'
+import { useMedia } from '@/composables/useMedia'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 
@@ -260,10 +292,17 @@ const currentSection = ref('posts')
 
 const { currentUser, logout, fetchProfile } = useAuth()
 const { posts, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
+const { medias, fetchMedias } = useMedia()
+
+// Biblioteca de mídias da agência (só consulta): carrega ao abrir a seção
+function openLibrary() {
+  currentSection.value = 'medias'
+  if (linkedAgency.value) fetchMedias().catch(() => {})
+}
 useAutoRefresh(() => refreshPostsSilently())
 const { duplicateAsDraft } = usePostDuplication()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
-const { openCreatePostModal, openPostDetailModal } = useModals()
+const { openCreatePostModal, openPostDetailModal, openMediaDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 

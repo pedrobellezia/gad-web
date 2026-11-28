@@ -133,56 +133,17 @@
           </div>
         </div>
 
-        <div v-if="medias.length === 0" class="bg-surface-50 dark:bg-surface-800/85 rounded-xl p-8 border border-surface-200 dark:border-surface-700/80 text-center text-sm text-surface-500 dark:text-surface-400">
-          Nenhuma mídia enviada ainda para esta agência.
-        </div>
-
-        <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div
-            v-for="m in medias"
-            :key="m.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 overflow-hidden flex flex-col shadow-xs dark:shadow-card-dark"
-          >
+        <MediaLibraryGrid :medias="medias">
+          <template #actions="{ media }">
             <button
               type="button"
-              @click="openMediaViewer(m)"
-              class="h-36 w-full bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center overflow-hidden relative cursor-zoom-in"
-              :title="m.media_type === 'video' ? 'Assistir vídeo original' : 'Ver imagem original'"
+              @click="openMediaDetailModal(media)"
+              class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 shrink-0"
             >
-              <MediaImage :media-id="m.id" :alt="m.alias" :video="m.media_type === 'video'" />
+              <Edit class="w-3.5 h-3.5" />Editar
             </button>
-
-            <div class="p-3 flex-1 flex flex-col justify-between">
-              <div>
-                <p class="text-xs font-semibold text-surface-800 dark:text-surface-100 truncate" :title="m.alias">{{ m.alias }}</p>
-                <p class="text-[11px] text-surface-500 dark:text-surface-400 font-mono">{{ (m.size_bytes / 1024).toFixed(1) }} KB</p>
-                <p class="text-[11px] text-surface-500 dark:text-surface-400 truncate">Designer: {{ memberName(designers, m.designer_id) }}</p>
-              </div>
-
-              <div class="flex items-center justify-between pt-2 border-t border-surface-200/80 dark:border-surface-700/80 mt-2">
-                <button
-                  @click="promptRenameMedia(m)"
-                  class="text-[11px] text-brand-600 dark:text-brand-400 hover:underline font-medium"
-                >
-                  Renomear
-                </button>
-                <button
-                  @click="openAssignDesigner(m)"
-                  class="text-[11px] text-surface-600 dark:text-surface-300 hover:underline"
-                >
-                  Designer
-                </button>
-                <button
-                  @click="handleDeleteMedia(m.id)"
-                  class="text-surface-400 hover:text-danger dark:hover:text-red-400 p-1"
-                  title="Excluir mídia"
-                >
-                  <Trash2 class="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+          </template>
+        </MediaLibraryGrid>
       </div>
 
       <!-- Section: Tokens -->
@@ -313,29 +274,20 @@
     <CreatePostModal />
     <EditPostModal />
     <PostDetailModal />
-    <AssignMemberModal
-      :open="assign.open"
-      :title="assign.title"
-      :label="assign.label"
-      :empty-label="assign.emptyLabel"
-      :no-options-hint="assign.noOptionsHint"
-      :options="assign.options"
-      :current-id="assign.currentId"
-      :on-confirm="assign.onConfirm"
-      @close="assign.open = false"
-    />
+    <MediaDetailModal />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
-import AssignMemberModal, { type MemberOption } from '@/components/AssignMemberModal.vue'
+import MediaDetailModal from '@/components/MediaDetailModal.vue'
+import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
@@ -344,10 +296,8 @@ import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
-import MediaImage from '@/components/MediaImage.vue'
 import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
-import { useMediaViewer } from '@/composables/useMediaViewer'
-import type { PostItem, MediaItem, PostStatus, InviteTokenItem } from '@/types/api'
+import type { PostItem, PostStatus, InviteTokenItem } from '@/types/api'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
@@ -355,7 +305,7 @@ import {
   Plus, Edit, Trash2, Copy, HelpCircle, Sun, Moon
 } from '@lucide/vue'
 
-const { confirmDialog, promptDialog } = useDialog()
+const { confirmDialog } = useDialog()
 const currentSection = ref('overview')
 
 const filterOptions = [
@@ -370,10 +320,9 @@ const filterOptions = [
 const { fetchProfile } = useAuth()
 const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
 useAutoRefresh(() => refreshPostsSilently())
-const { openMediaViewer } = useMediaViewer()
-const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
+const { medias, fetchMedias } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
-const { openPostDetailModal } = useModals()
+const { openPostDetailModal, openMediaDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
@@ -407,55 +356,9 @@ async function publishPost(post: PostItem) {
   await updateStatus(post.id, 'published', post.version)
 }
 
-const assign = reactive({
-  open: false,
-  title: '',
-  label: '',
-  emptyLabel: '',
-  noOptionsHint: '',
-  options: [] as MemberOption[],
-  currentId: null as string | null,
-  onConfirm: (async () => {}) as (id: string | null) => Promise<unknown>
-})
-
-type Member = { user: { id: string; name: string } }
-
-function toOptions(members: Member[]): MemberOption[] {
-  return members.map(m => ({ id: m.user.id, name: m.user.name }))
-}
-
-function memberName(members: Member[], id: string | null): string {
-  if (!id) return 'Nenhum'
-  return members.find(m => m.user.id === id)?.user.name ?? 'Desvinculado'
-}
-
 async function handleDeletePost(postId: string) {
   if (!(await confirmDialog({ title: 'Excluir post', message: 'Deseja realmente excluir este post?', confirmLabel: 'Excluir', danger: true }))) return
   await deletePost(postId)
-}
-
-async function promptRenameMedia(media: MediaItem) {
-  const newAlias = await promptDialog({ title: 'Renomear mídia', label: 'Novo alias da mídia', defaultValue: media.alias, confirmLabel: 'Renomear' })
-  if (!newAlias || newAlias.trim() === media.alias) return
-  await updateAlias(media.id, newAlias.trim())
-}
-
-function openAssignDesigner(media: MediaItem) {
-  Object.assign(assign, {
-    open: true,
-    title: 'Atribuir Designer',
-    label: `Designer responsável por "${media.alias}"`,
-    emptyLabel: 'Nenhum designer',
-    noOptionsHint: 'Nenhum designer vinculado à agência ainda.',
-    options: toOptions(designers.value),
-    currentId: media.designer_id,
-    onConfirm: (id: string | null) => updateDesigner(media.id, id)
-  })
-}
-
-async function handleDeleteMedia(mediaId: string) {
-  if (!(await confirmDialog({ title: 'Excluir mídia', message: 'Deseja realmente excluir esta mídia da biblioteca?', confirmLabel: 'Excluir', danger: true }))) return
-  await deleteMedia(mediaId)
 }
 
 // Gera um token na hora e já copia, para colar direto no convite
