@@ -252,7 +252,7 @@
 
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import LinkedAgencyOverview from '@/components/LinkedAgencyOverview.vue'
@@ -261,6 +261,7 @@ import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useDashboardSection } from '@/composables/useDashboardSection'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { usePostDuplication } from '@/composables/usePostDuplication'
@@ -278,20 +279,25 @@ import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 
 const { confirmDialog } = useDialog()
-const currentSection = ref('posts')
+const currentSection = useDashboardSection(['posts', 'medias', 'agency', 'profile'] as const, 'posts')
 
 const { currentUser, logout, fetchProfile } = useAuth()
 const { posts, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
 const { medias, fetchMedias } = useMedia()
 
-// Biblioteca de mídias da agência (só consulta): carrega ao abrir a seção
+// Biblioteca de mídias da agência (só consulta): carrega ao abrir a seção,
+// inclusive quando a página é recarregada já nela (?aba=medias)
 function openLibrary() {
   currentSection.value = 'medias'
-  if (linkedAgency.value) fetchMedias().catch(() => {})
 }
 useAutoRefresh(() => refreshPostsSilently())
 const { duplicateAsDraft } = usePostDuplication()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
+watch(
+  () => currentSection.value === 'medias' && !!linkedAgency.value,
+  (shouldLoad) => { if (shouldLoad) fetchMedias().catch(() => {}) },
+  { immediate: true }
+)
 const { openCreatePostModal, openPostDetailModal, openMediaDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()

@@ -250,6 +250,7 @@
 import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useDashboardSection } from '@/composables/useDashboardSection'
 import { useMedia } from '@/composables/useMedia'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
@@ -299,7 +300,7 @@ const { openUploadMediaModal, openMediaDetailModal, openChangePasswordModal } = 
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
-const currentSection = ref<'gallery' | 'agency' | 'profile'>('gallery')
+const currentSection = useDashboardSection(['gallery', 'agency', 'profile'] as const, 'gallery')
 const profileName = ref('')
 const linkedAgency = ref<AgencyPublic | null>(null)
 const tokenInput = ref('')
