@@ -289,6 +289,7 @@ import PostDetailModal from '@/components/PostDetailModal.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useDashboardSection } from '@/composables/useDashboardSection'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useMedia } from '@/composables/useMedia'
@@ -306,7 +307,7 @@ import {
 } from '@lucide/vue'
 
 const { confirmDialog } = useDialog()
-const currentSection = ref('overview')
+const currentSection = useDashboardSection(['overview', 'medias', 'tokens', 'members', 'activity'] as const, 'overview')
 
 const filterOptions = [
   { value: 'all', label: 'Todos' },

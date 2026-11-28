@@ -249,6 +249,7 @@
 import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useDashboardSection } from '@/composables/useDashboardSection'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
 import { useModals } from '@/composables/useModals'
@@ -287,7 +288,7 @@ const { openApprovalModal, openPostDetailModal, openChangePasswordModal } = useM
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
-const currentSection = ref<'posts' | 'history' | 'agency' | 'profile'>('posts')
+const currentSection = useDashboardSection(['posts', 'history', 'agency', 'profile'] as const, 'posts')
 const profileName = ref('')
 const linkedAgency = ref<AgencyPublic | null>(null)
 const tokenInput = ref('')
