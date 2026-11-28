@@ -99,7 +99,7 @@
             <div class="h-40 bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center relative overflow-hidden">
               <MediaImage :media-id="media.id" :alt="media.alias" :video="media.media_type === 'video'" />
               <span class="absolute top-2 right-2 text-[10px] bg-surface-950/70 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
-                {{ (media.size_bytes / 1024).toFixed(0) }} KB
+                {{ formatBytes(media.size_bytes) }}
               </span>
             </div>
 
@@ -280,6 +280,7 @@ import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaImage from '@/components/MediaImage.vue'
+import { formatBytes } from '@/utils/format'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import {
   Image,

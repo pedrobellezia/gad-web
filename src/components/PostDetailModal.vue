@@ -210,6 +210,7 @@ import StatusBadge from './StatusBadge.vue'
 import PostPeopleTab from './PostPeopleTab.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
+import { formatBytes } from '@/utils/format'
 import type { CommentItem, PostItem } from '@/types/api'
 import { X, FileText, MessageCircle, History, Send, Trash2, Undo2, Edit, Copy, Users } from '@lucide/vue'
 
@@ -315,12 +316,6 @@ function formatDate(iso: string): string {
   } catch {
     return iso
   }
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 function isOwnComment(cmt: CommentItem): boolean {
