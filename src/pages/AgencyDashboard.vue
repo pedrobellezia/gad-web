@@ -158,10 +158,9 @@
               <button
                 type="button"
                 @click="openMediaDetailModal(m)"
-                class="p-1.5 -mr-1 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition shrink-0"
-                title="Detalhes"
+                class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 shrink-0"
               >
-                <SlidersHorizontal class="w-4 h-4" />
+                <Edit class="w-3.5 h-3.5" />Editar
               </button>
             </div>
           </div>
@@ -325,7 +324,7 @@ import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
   LayoutDashboard, Image, Key, Users, Activity,
-  Plus, Trash2, Copy, HelpCircle, SlidersHorizontal, Sun, Moon
+  Plus, Edit, Trash2, Copy, HelpCircle, Sun, Moon
 } from '@lucide/vue'
 
 const { confirmDialog } = useDialog()
