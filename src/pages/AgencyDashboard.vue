@@ -188,12 +188,35 @@
       <!-- Section: Tokens -->
       <div v-if="currentSection === 'tokens'" class="fade-in mb-8">
         <div class="flex items-center justify-between mb-6">
-          <div>
+          <div class="flex items-center gap-2">
             <h2 class="text-xl font-bold text-surface-900 dark:text-surface-50">Tokens de Convite</h2>
-            <p class="text-sm text-surface-500 dark:text-surface-400">Tokens descartáveis para vincular clientes, redatores e designers</p>
+            <!-- Ajuda: explica o token ao passar o mouse (ou ao focar pelo teclado) -->
+            <div class="relative group">
+              <button
+                type="button"
+                class="p-1 rounded-full text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 transition"
+                aria-label="Como funcionam os tokens de convite"
+                aria-describedby="token-help"
+              >
+                <HelpCircle class="w-4 h-4" />
+              </button>
+              <div
+                id="token-help"
+                role="tooltip"
+                class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full mt-2 z-20 w-72 p-3 rounded-lg bg-surface-900 dark:bg-surface-700 text-surface-50 text-xs leading-relaxed shadow-lg"
+              >
+                <p class="font-semibold mb-1">Como funciona</p>
+                <ul class="list-disc pl-4 space-y-0.5">
+                  <li>Gere um token e envie para o cliente, redator ou designer que vai entrar na agência.</li>
+                  <li>A pessoa digita o código no painel dela, na área de vínculo com a agência.</li>
+                  <li>Cada token vincula uma pessoa só e some da lista depois de usado.</li>
+                  <li>Vale por 7 dias. Depois disso, gere outro.</li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <button @click="promptGenerateTokens" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5">
-            <Plus class="w-4 h-4" />Gerar Tokens
+          <button @click="handleGenerateToken" :disabled="isGeneratingToken" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 disabled:opacity-50">
+            <Plus class="w-4 h-4" />Gerar token
           </button>
         </div>
 
@@ -201,20 +224,23 @@
           Nenhum token ativo no momento. Clique acima para gerar.
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div v-else class="flex flex-wrap gap-2">
           <div
             v-for="t in tokens"
             :key="t.token"
-            class="bg-surface-50 dark:bg-surface-800/85 p-4 rounded-xl border border-surface-200 dark:border-surface-700/80 flex items-center justify-between shadow-xs dark:shadow-card-dark"
+            :class="[
+              'inline-flex items-center gap-1 pl-3 pr-1 py-1 rounded-lg border bg-surface-50 dark:bg-surface-800/85 shadow-xs dark:shadow-card-dark transition',
+              t.token === lastToken ? 'border-brand-400 dark:border-brand-500/60 ring-2 ring-brand-200 dark:ring-brand-500/25' : 'border-surface-200 dark:border-surface-700/80'
+            ]"
           >
-            <div>
-              <code class="text-sm font-mono font-bold text-brand-600 dark:text-brand-300 bg-brand-50 dark:bg-brand-500/15 px-2 py-0.5 rounded">{{ t.token }}</code>
-              <p class="text-[11px] text-surface-500 dark:text-surface-400 mt-1">Token de uso único</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button @click="copyToken(t.token)" class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium">Copiar</button>
-              <button @click="handleDeleteToken(t.token)" class="btn-danger px-2.5 py-1.5 rounded-lg text-xs font-medium">Excluir</button>
-            </div>
+            <code class="text-sm font-mono font-bold text-brand-600 dark:text-brand-300 mr-1">{{ t.token }}</code>
+            <span v-if="t.expires_at" class="text-[10px] text-surface-500 dark:text-surface-400 mr-1 whitespace-nowrap" :title="`Válido até ${formatTokenExpiry(t.expires_at)}`">{{ expiresInLabel(t.expires_at) }}</span>
+            <button @click="copyToken(t.token)" class="p-1.5 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition" title="Copiar">
+              <Copy class="w-3.5 h-3.5" />
+            </button>
+            <button @click="handleDeleteToken(t.token)" class="p-1.5 rounded-md text-surface-500 hover:text-red-600 hover:bg-red-50 dark:text-surface-400 dark:hover:text-red-400 dark:hover:bg-red-500/10 transition" title="Excluir">
+              <Trash2 class="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
@@ -326,7 +352,7 @@ import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
   LayoutDashboard, Image, Key, Users, Activity,
-  Plus, Edit, Trash2, Sun, Moon
+  Plus, Edit, Trash2, Copy, HelpCircle, Sun, Moon
 } from '@lucide/vue'
 
 const { confirmDialog, promptDialog } = useDialog()
@@ -432,20 +458,51 @@ async function handleDeleteMedia(mediaId: string) {
   await deleteMedia(mediaId)
 }
 
-async function promptGenerateTokens() {
-  const qtyStr = await promptDialog({ title: 'Gerar tokens de convite', label: 'Quantidade de tokens (1 a 100)', defaultValue: '4', inputType: 'number', min: 1, max: 100, confirmLabel: 'Gerar' })
-  if (!qtyStr) return
-  const qty = parseInt(qtyStr, 10)
-  if (isNaN(qty) || qty < 1 || qty > 100) {
-    showToast('Quantidade inválida (deve ser entre 1 e 100)', 'error')
-    return
+// Gera um token na hora e já copia, para colar direto no convite
+const isGeneratingToken = ref(false)
+const lastToken = ref<string | null>(null)
+
+async function handleGenerateToken() {
+  isGeneratingToken.value = true
+  try {
+    const [created] = await createTokens(1)
+    if (!created) return
+    lastToken.value = created
+    const copied = await writeClipboard(created)
+    showToast(copied ? 'Token gerado e copiado!' : 'Token gerado!', 'success')
+  } catch {
+    // erro já exibido via toast pelo composable
+  } finally {
+    isGeneratingToken.value = false
   }
-  await createTokens(qty)
 }
 
-function copyToken(tokenStr: string) {
-  navigator.clipboard.writeText(tokenStr)
-  showToast('Token copiado para a área de transferência!', 'success')
+// Tokens valem 7 dias: mostra quanto falta para vencer
+function expiresInLabel(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now()
+  if (ms <= 0) return 'vencido'
+  const hours = Math.ceil(ms / 3_600_000)
+  if (hours < 24) return `expira em ${hours}h`
+  const days = Math.ceil(hours / 24)
+  return `expira em ${days} dia${days > 1 ? 's' : ''}`
+}
+
+function formatTokenExpiry(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR')
+}
+
+async function writeClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function copyToken(tokenStr: string) {
+  const copied = await writeClipboard(tokenStr)
+  showToast(copied ? 'Token copiado!' : 'Não foi possível copiar o token', copied ? 'success' : 'error')
 }
 
 async function handleDeleteToken(tokenStr: string) {

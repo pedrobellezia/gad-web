@@ -179,8 +179,11 @@
               v-model="tokenInput"
               type="text"
               required
-              placeholder="Cole o token de convite aqui..."
-              class="flex-1 px-4 py-2 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm font-mono bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
+              placeholder="Ex: K7M2QP"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              class="flex-1 px-4 py-2 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm font-mono uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
             />
             <button type="submit" class="btn-primary px-5 py-2 rounded-lg text-sm font-medium">
               Conectar
