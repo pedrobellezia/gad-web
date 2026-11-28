@@ -27,14 +27,6 @@
           />
         </div>
 
-        <ClientPicker
-          v-if="canEditClient"
-          v-model="form.client_id"
-          label="Cliente Destinatário"
-          :clients="clients"
-          none-label="Nenhum cliente (volta para rascunho)"
-        />
-
         <div>
           <label class="block text-sm font-medium text-surface-700 dark:text-surface-200 mb-1">Conteúdo do Post *</label>
           <textarea
@@ -69,39 +61,29 @@
 import { reactive, ref, watch, computed } from 'vue'
 import { useModals } from '@/composables/useModals'
 import { usePosts } from '@/composables/usePosts'
-import { useAuth } from '@/composables/useAuth'
-import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useMedia } from '@/composables/useMedia'
 import { X, AlertCircle } from '@lucide/vue'
 import PostMediaPicker, { type SelectedMedia } from './PostMediaPicker.vue'
-import ClientPicker from './ClientPicker.vue'
 
 const { editPostModalOpen, selectedPostForEdit, closeEditPostModal } = useModals()
 const { updatePost, isLoading } = usePosts()
-const { currentUser } = useAuth()
-const { clients, fetchAllMembers } = useAgencyMembers()
 const { medias, fetchMedias } = useMedia()
 
 const form = reactive({
   title: '',
-  content: '',
-  client_id: null as string | null
+  content: ''
 })
 
 const selectedMedias = ref<SelectedMedia[]>([])
 const knownMedias = computed(() => selectedPostForEdit.value?.medias.map(pm => pm.media) ?? [])
 
-const canEditClient = computed(() => currentUser.value?.type === 'agency')
-
 watch(selectedPostForEdit, (post) => {
   if (post) {
     form.title = post.title
     form.content = post.content
-    form.client_id = post.client_id
     selectedMedias.value = [...post.medias]
       .sort((a, b) => a.position - b.position)
       .map((pm, idx) => ({ media_id: pm.media.id, position: idx }))
-    fetchAllMembers().catch(() => {})
     fetchMedias().catch(() => {})
   }
 })
@@ -114,16 +96,11 @@ async function handleSubmit() {
       content: string
       version: number
       medias: { media_id: string; position: number }[]
-      client_id?: string | null
     } = {
       title: form.title,
       content: form.content,
       medias: selectedMedias.value,
       version: selectedPostForEdit.value.version
-    }
-
-    if (canEditClient.value) {
-      payload.client_id = form.client_id
     }
 
     await updatePost(selectedPostForEdit.value.id, payload)

@@ -286,7 +286,7 @@
     <!-- Modals -->
     <CreatePostModal />
     <EditPostModal />
-    <PostDetailModal @change-writer="openAssignWriter" />
+    <PostDetailModal />
     <AssignMemberModal
       :open="assign.open"
       :title="assign.title"
@@ -342,7 +342,7 @@ const filterOptions = [
 ]
 
 const { fetchProfile } = useAuth()
-const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, updateWriter, deletePost } = usePosts()
+const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
 useAutoRefresh(() => refreshPostsSilently())
 const { openMediaViewer } = useMediaViewer()
 const { medias, fetchMedias, updateAlias, updateDesigner, deleteMedia } = useMedia()
@@ -401,19 +401,6 @@ function toOptions(members: Member[]): MemberOption[] {
 function memberName(members: Member[], id: string | null): string {
   if (!id) return 'Nenhum'
   return members.find(m => m.user.id === id)?.user.name ?? 'Desvinculado'
-}
-
-function openAssignWriter(post: PostItem) {
-  Object.assign(assign, {
-    open: true,
-    title: 'Trocar Redator',
-    label: `Redator responsável por "${post.title}"`,
-    emptyLabel: 'Nenhum redator',
-    noOptionsHint: 'Nenhum redator vinculado à agência ainda.',
-    options: toOptions(writers.value),
-    currentId: post.writer_id,
-    onConfirm: (id: string | null) => updateWriter(post.id, id, post.version)
-  })
 }
 
 async function handleDeletePost(postId: string) {

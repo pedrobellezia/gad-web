@@ -2,11 +2,11 @@
   <div>
     <div class="flex items-center justify-between mb-1.5">
       <label class="block text-sm font-medium text-surface-700 dark:text-surface-200">{{ label }}</label>
-      <span v-if="invalid" class="text-xs text-danger dark:text-red-400">Selecione um cliente</span>
+      <span v-if="invalid" class="text-xs text-danger dark:text-red-400">Selecione um {{ noun }}</span>
     </div>
 
-    <div v-if="clients.length === 0" class="text-xs text-surface-500 dark:text-surface-400 p-4 rounded-xl border border-dashed border-surface-300 dark:border-surface-700 text-center">
-      Nenhum cliente vinculado à agência ainda.
+    <div v-if="members.length === 0" class="text-xs text-surface-500 dark:text-surface-400 p-4 rounded-xl border border-dashed border-surface-300 dark:border-surface-700 text-center">
+      Nenhum {{ noun }} vinculado à agência ainda.
     </div>
 
     <div
@@ -16,13 +16,13 @@
         invalid ? 'border-red-300 dark:border-red-500/50' : 'border-surface-200 dark:border-surface-700/80'
       ]"
     >
-      <div v-if="clients.length > 5" class="p-2 border-b border-surface-200 dark:border-surface-700/80">
+      <div v-if="members.length > 5" class="p-2 border-b border-surface-200 dark:border-surface-700/80">
         <div class="relative">
           <Search class="w-4 h-4 text-surface-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             v-model="search"
             type="search"
-            placeholder="Buscar cliente pelo nome..."
+            :placeholder="`Buscar ${noun} pelo nome...`"
             class="w-full pl-9 pr-3 py-2 rounded-lg border border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:focus:border-brand-400 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-500/25 outline-none text-sm bg-surface-50 dark:bg-surface-900 text-surface-800 dark:text-surface-100 placeholder:text-surface-400 dark:placeholder:text-surface-500"
             @keydown.enter.prevent
           />
@@ -63,7 +63,7 @@
         </button>
 
         <p v-if="filtered.length === 0" class="text-xs text-surface-500 dark:text-surface-400 text-center py-3">
-          Nenhum cliente corresponde a "{{ search }}".
+          Nenhum {{ noun }} corresponde a "{{ search }}".
         </p>
       </div>
     </div>
@@ -76,13 +76,15 @@ import { useMediaCache } from '@/composables/useMediaCache'
 import type { AgencyMember } from '@/types/api'
 import { Search, Check, UserX } from '@lucide/vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   label: string
-  clients: AgencyMember[]
+  members: AgencyMember[]
+  // Como chamar a pessoa nos textos (ex.: "cliente", "redator")
+  noun?: string
   // Quando informado, exibe a opção de deixar o post sem cliente
   noneLabel?: string
   invalid?: boolean
-}>()
+}>(), { noun: 'cliente' })
 
 const model = defineModel<string | null>({ required: true })
 
@@ -95,8 +97,8 @@ function normalize(text: string): string {
 
 const filtered = computed(() => {
   const term = normalize(search.value.trim())
-  if (!term) return props.clients
-  return props.clients.filter(cl => normalize(cl.user.name).includes(term))
+  if (!term) return props.members
+  return props.members.filter(cl => normalize(cl.user.name).includes(term))
 })
 
 function avatarPath(cl: AgencyMember): string | null {
@@ -108,7 +110,7 @@ function avatarOf(cl: AgencyMember): string | undefined {
 }
 
 watch(
-  () => props.clients,
+  () => props.members,
   (list) => list.forEach(cl => loadAvatar(avatarPath(cl))),
   { immediate: true }
 )

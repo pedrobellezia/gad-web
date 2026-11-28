@@ -20,10 +20,10 @@
           />
         </div>
 
-        <ClientPicker
+        <MemberPicker
           v-model="form.client_id"
           label="Cliente Destinatário *"
-          :clients="clients"
+          :members="clients"
           :invalid="clientInvalid"
         />
 
@@ -65,7 +65,7 @@ import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useMedia } from '@/composables/useMedia'
 import { X } from '@lucide/vue'
 import PostMediaPicker, { type SelectedMedia } from './PostMediaPicker.vue'
-import ClientPicker from './ClientPicker.vue'
+import MemberPicker from './MemberPicker.vue'
 
 const { createPostModalOpen, createPostPrefill, closeCreatePostModal } = useModals()
 const { createPost, isLoading } = usePosts()
