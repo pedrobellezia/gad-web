@@ -133,38 +133,17 @@
           </div>
         </div>
 
-        <div v-if="medias.length === 0" class="bg-surface-50 dark:bg-surface-800/85 rounded-xl p-8 border border-surface-200 dark:border-surface-700/80 text-center text-sm text-surface-500 dark:text-surface-400">
-          Nenhuma mídia enviada ainda para esta agência.
-        </div>
-
-        <!-- Card simples: miniatura, nome e detalhes. O resto fica no modal de detalhes -->
-        <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          <div
-            v-for="m in medias"
-            :key="m.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 overflow-hidden flex flex-col shadow-xs dark:shadow-card-dark"
-          >
+        <MediaLibraryGrid :medias="medias">
+          <template #actions="{ media }">
             <button
               type="button"
-              @click="openMediaViewer(m)"
-              class="aspect-[4/5] w-full bg-surface-200/70 dark:bg-surface-900 overflow-hidden cursor-zoom-in"
-              :title="m.media_type === 'video' ? 'Assistir vídeo original' : 'Ver imagem original'"
+              @click="openMediaDetailModal(media)"
+              class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 shrink-0"
             >
-              <MediaImage :media-id="m.id" :alt="m.alias" :video="m.media_type === 'video'" />
+              <Edit class="w-3.5 h-3.5" />Editar
             </button>
-
-            <div class="px-3 py-2 flex items-center gap-2">
-              <p class="flex-1 min-w-0 text-xs font-semibold text-surface-800 dark:text-surface-100 truncate" :title="m.alias">{{ m.alias }}</p>
-              <button
-                type="button"
-                @click="openMediaDetailModal(m)"
-                class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 shrink-0"
-              >
-                <Edit class="w-3.5 h-3.5" />Editar
-              </button>
-            </div>
-          </div>
-        </div>
+          </template>
+        </MediaLibraryGrid>
       </div>
 
       <!-- Section: Tokens -->
@@ -308,6 +287,7 @@ import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
 import PostDetailModal from '@/components/PostDetailModal.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
+import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
 import { useAuth } from '@/composables/useAuth'
 import { usePosts } from '@/composables/usePosts'
 import { useAutoRefresh } from '@/composables/useAutoRefresh'
@@ -316,9 +296,7 @@ import { useAgencyMembers } from '@/composables/useAgencyMembers'
 import { useModals } from '@/composables/useModals'
 import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
-import MediaImage from '@/components/MediaImage.vue'
 import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
-import { useMediaViewer } from '@/composables/useMediaViewer'
 import type { PostItem, PostStatus, InviteTokenItem } from '@/types/api'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
@@ -342,7 +320,6 @@ const filterOptions = [
 const { fetchProfile } = useAuth()
 const { posts, filteredPosts, activeFilter, setFilter, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
 useAutoRefresh(() => refreshPostsSilently())
-const { openMediaViewer } = useMediaViewer()
 const { medias, fetchMedias } = useMedia()
 const { tokens, clients, writers, designers, fetchTokens, createTokens, deleteToken, fetchAllMembers, unlinkMember } = useAgencyMembers()
 const { openPostDetailModal, openMediaDetailModal } = useModals()

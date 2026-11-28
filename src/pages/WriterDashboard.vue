@@ -26,6 +26,12 @@
           <FileText class="w-4 h-4" />Meus Posts
         </button>
         <button
+          @click="openLibrary"
+          :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'medias' }]"
+        >
+          <Image class="w-4 h-4" />Biblioteca de Mídias
+        </button>
+        <button
           @click="currentSection = 'agency'"
           :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'agency' }]"
         >
@@ -154,6 +160,17 @@
       </div>
 
       <!-- Section: Agency Link -->
+      <!-- Biblioteca da agência, só para consulta (edição fica com a agência e o designer) -->
+      <div v-if="currentSection === 'medias'" class="fade-in">
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-surface-900 dark:text-surface-50">Biblioteca de Mídias</h2>
+        </div>
+        <MediaLibraryGrid
+          :medias="medias"
+          :empty-text="linkedAgency ? 'Nenhuma mídia enviada ainda para esta agência.' : 'Vincule-se a uma agência para ver a biblioteca de mídias.'"
+        />
+      </div>
+
       <div v-if="currentSection === 'agency'" class="fade-in max-w-xl">
         <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-50 mb-2">Vínculo com Agência</h2>
         <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Redatores vinculados podem criar posts e acessar a biblioteca da agência</p>
@@ -251,7 +268,9 @@ import { useTheme } from '@/composables/useTheme'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem, PostStatus } from '@/types/api'
-import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy } from '@lucide/vue'
+import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy, Image } from '@lucide/vue'
+import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
+import { useMedia } from '@/composables/useMedia'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 
@@ -260,6 +279,13 @@ const currentSection = ref('posts')
 
 const { currentUser, logout, fetchProfile } = useAuth()
 const { posts, fetchPosts, refreshPostsSilently, updateStatus, deletePost } = usePosts()
+const { medias, fetchMedias } = useMedia()
+
+// Biblioteca de mídias da agência (só consulta): carrega ao abrir a seção
+function openLibrary() {
+  currentSection.value = 'medias'
+  if (linkedAgency.value) fetchMedias().catch(() => {})
+}
 useAutoRefresh(() => refreshPostsSilently())
 const { duplicateAsDraft } = usePostDuplication()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
