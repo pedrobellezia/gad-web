@@ -190,7 +190,7 @@
         <div class="flex items-center justify-between mb-6">
           <div>
             <h2 class="text-xl font-bold text-surface-900 dark:text-surface-50">Tokens de Convite</h2>
-            <p class="text-sm text-surface-500 dark:text-surface-400">Tokens de uso único para vincular clientes, redatores e designers</p>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Tokens de uso único, válidos por 7 dias, para vincular clientes, redatores e designers</p>
           </div>
           <button @click="handleGenerateToken" :disabled="isGeneratingToken" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 disabled:opacity-50">
             <Plus class="w-4 h-4" />Gerar token
@@ -211,6 +211,7 @@
             ]"
           >
             <code class="text-sm font-mono font-bold text-brand-600 dark:text-brand-300 mr-1">{{ t.token }}</code>
+            <span v-if="t.expires_at" class="text-[10px] text-surface-500 dark:text-surface-400 mr-1 whitespace-nowrap" :title="`Válido até ${formatTokenExpiry(t.expires_at)}`">{{ expiresInLabel(t.expires_at) }}</span>
             <button @click="copyToken(t.token)" class="p-1.5 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition" title="Copiar">
               <Copy class="w-3.5 h-3.5" />
             </button>
@@ -464,6 +465,20 @@ async function handleGenerateToken() {
   } finally {
     isGeneratingToken.value = false
   }
+}
+
+// Tokens valem 7 dias: mostra quanto falta para vencer
+function expiresInLabel(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now()
+  if (ms <= 0) return 'vencido'
+  const hours = Math.ceil(ms / 3_600_000)
+  if (hours < 24) return `expira em ${hours}h`
+  const days = Math.ceil(hours / 24)
+  return `expira em ${days} dia${days > 1 ? 's' : ''}`
+}
+
+function formatTokenExpiry(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR')
 }
 
 async function writeClipboard(text: string): Promise<boolean> {

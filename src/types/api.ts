@@ -110,6 +110,9 @@ export interface PostItem {
 export interface InviteTokenItem {
   token: string
   agency_id: string
+  created_at?: string
+  // Tokens valem 7 dias (API v1.0.7+)
+  expires_at?: string
 }
 
 export interface AuditLogItem {
