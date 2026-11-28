@@ -63,7 +63,7 @@
           </div>
 
           <!-- Designer (só a agência troca a autoria) -->
-          <section v-if="isAgency" class="p-4 bg-surface-100/80 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80">
+          <section v-if="isAgency || selectedMediaForDetail.designer !== undefined" class="p-4 bg-surface-100/80 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-surface-600 dark:text-surface-300 mb-3">Designer</h4>
 
             <div v-if="editingDesigner" class="space-y-3">
@@ -90,7 +90,7 @@
 
             <div v-else class="flex items-center justify-between gap-3 flex-wrap">
               <UserChip :user="currentDesigner" label="Designer" :empty-text="designerEmptyText" />
-              <div class="flex items-center gap-2">
+              <div v-if="isAgency" class="flex items-center gap-2">
                 <template v-if="selectedMediaForDetail.designer_id">
                   <button
                     type="button"
@@ -121,7 +121,7 @@
           </section>
 
           <!-- Edição do nome -->
-          <form @submit.prevent="handleSaveAlias" class="p-4 bg-surface-100/80 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80 space-y-3">
+          <form v-if="canEditMedia" @submit.prevent="handleSaveAlias" class="p-4 bg-surface-100/80 dark:bg-surface-900/75 rounded-xl border border-surface-200 dark:border-surface-700/80 space-y-3">
             <label class="block text-xs font-semibold uppercase tracking-wider text-surface-600 dark:text-surface-300">Nome da mídia</label>
             <div class="flex gap-2">
               <input
@@ -141,7 +141,7 @@
           </form>
 
           <!-- Ação perigosa: Excluir -->
-          <div class="pt-4 border-t border-surface-200 dark:border-surface-700/80 flex justify-between items-center gap-3">
+          <div v-if="canEditMedia" class="pt-4 border-t border-surface-200 dark:border-surface-700/80 flex justify-between items-center gap-3">
             <span class="text-xs text-surface-500 dark:text-surface-400">Mídias usadas em posts aprovados, reprovados ou publicados não podem ser excluídas.</span>
             <button
               type="button"
@@ -199,12 +199,18 @@ const isVideo = computed(() => selectedMediaForDetail.value?.media_type === 'vid
 const formatLabel = computed(() => selectedMediaForDetail.value?.mime_type.split('/')[1]?.toUpperCase() ?? '')
 
 const currentDesigner = computed(() => {
-  const id = selectedMediaForDetail.value?.designer_id
-  if (!id) return null
-  return designers.value.find(d => d.user.id === id)?.user ?? null
+  const media = selectedMediaForDetail.value
+  if (!media?.designer_id) return null
+  // A API embute o designer na mídia; a lista da agência é o fallback
+  return media.designer ?? designers.value.find(d => d.user.id === media.designer_id)?.user ?? null
 })
-// Designer definido mas fora da lista (ex.: lista ainda carregando)
-const designerEmptyText = computed(() => selectedMediaForDetail.value?.designer_id ? 'Designer não encontrado' : 'Sem designer')
+// Renomear e excluir: a agência ou o designer da mídia (o redator só consulta)
+const canEditMedia = computed(() =>
+  isAgency.value ||
+  (currentUser.value?.type === 'designer' && selectedMediaForDetail.value?.designer_id === currentUser.value.id)
+)
+// designer_id sem resumo: conta desativada ou lista ainda carregando
+const designerEmptyText = computed(() => selectedMediaForDetail.value?.designer_id ? 'Designer indisponível' : 'Sem designer')
 
 watch(() => selectedMediaForDetail.value?.id, (id) => {
   if (!id || !selectedMediaForDetail.value) return

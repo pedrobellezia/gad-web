@@ -53,6 +53,8 @@ export type MediaType = 'image' | 'video'
 export interface MediaItem {
   id: string
   designer_id: string | null
+  // Resumo público do designer (API v1.0.8+); null se não houver ou estiver desativado
+  designer?: UserSummary | null
   agency_id: string | null
   alias: string
   filename: string

@@ -168,7 +168,18 @@
         <MediaLibraryGrid
           :medias="medias"
           :empty-text="linkedAgency ? 'Nenhuma mídia enviada ainda para esta agência.' : 'Vincule-se a uma agência para ver a biblioteca de mídias.'"
-        />
+        >
+          <template #actions="{ media }">
+            <button
+              type="button"
+              @click="openMediaDetailModal(media)"
+              class="p-1.5 -mr-1 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition shrink-0"
+              title="Detalhes da mídia"
+            >
+              <Menu class="w-4 h-4" />
+            </button>
+          </template>
+        </MediaLibraryGrid>
       </div>
 
       <div v-if="currentSection === 'agency'" class="fade-in max-w-xl">
@@ -246,6 +257,7 @@
     <CreatePostModal />
     <EditPostModal />
     <PostDetailModal />
+    <MediaDetailModal />
   </div>
 </template>
 
@@ -268,8 +280,9 @@ import { useTheme } from '@/composables/useTheme'
 import { meApi } from '@/api/me'
 import { useToast } from '@/composables/useToast'
 import type { PostItem, PostStatus } from '@/types/api'
-import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy, Image } from '@lucide/vue'
+import { FileText, Building, User, Plus, Trash2, CheckCircle2, Sun, Moon, Copy, Image, Menu } from '@lucide/vue'
 import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
+import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import { useMedia } from '@/composables/useMedia'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
@@ -289,7 +302,7 @@ function openLibrary() {
 useAutoRefresh(() => refreshPostsSilently())
 const { duplicateAsDraft } = usePostDuplication()
 const { linkedAgency, fetchMyAgency, linkWithToken, selfUnlink } = useAgencyMembers()
-const { openCreatePostModal, openPostDetailModal } = useModals()
+const { openCreatePostModal, openPostDetailModal, openMediaDetailModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
 
