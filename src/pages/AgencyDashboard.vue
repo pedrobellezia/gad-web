@@ -188,9 +188,32 @@
       <!-- Section: Tokens -->
       <div v-if="currentSection === 'tokens'" class="fade-in mb-8">
         <div class="flex items-center justify-between mb-6">
-          <div>
+          <div class="flex items-center gap-2">
             <h2 class="text-xl font-bold text-surface-900 dark:text-surface-50">Tokens de Convite</h2>
-            <p class="text-sm text-surface-500 dark:text-surface-400">Tokens de uso único, válidos por 7 dias, para vincular clientes, redatores e designers</p>
+            <!-- Ajuda: explica o token ao passar o mouse (ou ao focar pelo teclado) -->
+            <div class="relative group">
+              <button
+                type="button"
+                class="p-1 rounded-full text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 transition"
+                aria-label="Como funcionam os tokens de convite"
+                aria-describedby="token-help"
+              >
+                <HelpCircle class="w-4 h-4" />
+              </button>
+              <div
+                id="token-help"
+                role="tooltip"
+                class="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full mt-2 z-20 w-72 p-3 rounded-lg bg-surface-900 dark:bg-surface-700 text-surface-50 text-xs leading-relaxed shadow-lg"
+              >
+                <p class="font-semibold mb-1">Como funciona</p>
+                <ul class="list-disc pl-4 space-y-0.5">
+                  <li>Gere um token e envie para o cliente, redator ou designer que vai entrar na agência.</li>
+                  <li>A pessoa digita o código no painel dela, na área de vínculo com a agência.</li>
+                  <li>Cada token vincula uma pessoa só e some da lista depois de usado.</li>
+                  <li>Vale por 7 dias. Depois disso, gere outro.</li>
+                </ul>
+              </div>
+            </div>
           </div>
           <button @click="handleGenerateToken" :disabled="isGeneratingToken" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 disabled:opacity-50">
             <Plus class="w-4 h-4" />Gerar token
@@ -329,7 +352,7 @@ import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
   LayoutDashboard, Image, Key, Users, Activity,
-  Plus, Edit, Trash2, Copy, Sun, Moon
+  Plus, Edit, Trash2, Copy, HelpCircle, Sun, Moon
 } from '@lucide/vue'
 
 const { confirmDialog, promptDialog } = useDialog()
