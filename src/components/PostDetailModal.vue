@@ -18,7 +18,7 @@
           @click="activeTab = 'content'"
           :class="['px-4 py-3 text-sm font-medium border-b-2 transition flex items-center gap-2 shrink-0', activeTab === 'content' ? 'border-brand-500 text-brand-600 dark:text-brand-300 bg-surface-50 dark:bg-surface-800' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200']"
         >
-          <FileText class="w-4 h-4" />Conteúdo & Mídias ({{ selectedPostForDetail.medias.length }})
+          <FileText class="w-4 h-4" />Conteúdo
         </button>
         <button
           @click="activeTab = 'people'"
@@ -36,7 +36,7 @@
           @click="activeTab = 'history'"
           :class="['px-4 py-3 text-sm font-medium border-b-2 transition flex items-center gap-2 shrink-0', activeTab === 'history' ? 'border-brand-500 text-brand-600 dark:text-brand-300 bg-surface-50 dark:bg-surface-800' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200']"
         >
-          <History class="w-4 h-4" />Histórico de Auditoria
+          <History class="w-4 h-4" />Histórico
         </button>
       </div>
 
