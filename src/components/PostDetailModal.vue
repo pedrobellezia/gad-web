@@ -12,29 +12,6 @@
         </button>
       </div>
 
-      <!-- Pessoas ligadas ao post -->
-      <div
-        v-if="selectedPostForDetail.client !== undefined || selectedPostForDetail.writer !== undefined"
-        class="px-6 py-3 border-b border-surface-200 dark:border-surface-700/80 flex flex-wrap items-center gap-x-8 gap-y-2 shrink-0"
-      >
-        <UserChip
-          v-if="selectedPostForDetail.client !== undefined"
-          :user="selectedPostForDetail.client"
-          label="Cliente"
-          :empty-text="recordedName(selectedPostForDetail.published_client_name, 'Sem cliente')"
-        />
-        <UserChip
-          v-if="selectedPostForDetail.writer !== undefined"
-          :user="selectedPostForDetail.writer"
-          label="Redator"
-          :empty-text="recordedName(selectedPostForDetail.published_writer_name, 'Sem redator')"
-        />
-        <div v-if="selectedPostForDetail.published_at" class="leading-tight">
-          <p class="text-[10px] uppercase tracking-wider text-surface-500 dark:text-surface-400">Publicado em</p>
-          <p class="text-sm font-medium text-surface-800 dark:text-surface-100">{{ formatDate(selectedPostForDetail.published_at) }}</p>
-        </div>
-      </div>
-
       <!-- Navigation Tabs -->
       <div class="flex border-b border-surface-200 dark:border-surface-700/80 px-6 bg-surface-100/70 dark:bg-surface-900/70 shrink-0 overflow-x-auto">
         <button
@@ -42,6 +19,12 @@
           :class="['px-4 py-3 text-sm font-medium border-b-2 transition flex items-center gap-2 shrink-0', activeTab === 'content' ? 'border-brand-500 text-brand-600 dark:text-brand-300 bg-surface-50 dark:bg-surface-800' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200']"
         >
           <FileText class="w-4 h-4" />Conteúdo & Mídias ({{ selectedPostForDetail.medias.length }})
+        </button>
+        <button
+          @click="activeTab = 'people'"
+          :class="['px-4 py-3 text-sm font-medium border-b-2 transition flex items-center gap-2 shrink-0', activeTab === 'people' ? 'border-brand-500 text-brand-600 dark:text-brand-300 bg-surface-50 dark:bg-surface-800' : 'border-transparent text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200']"
+        >
+          <Users class="w-4 h-4" />Redator & Cliente
         </button>
         <button
           @click="activeTab = 'comments'"
@@ -163,6 +146,13 @@
           </div>
         </div>
 
+        <!-- Redator e cliente do post -->
+        <PostPeopleTab
+          v-if="activeTab === 'people'"
+          :post="selectedPostForDetail"
+          @updated="onPeopleUpdated"
+        />
+
         <!-- TAB 3: Audit History -->
         <div v-if="activeTab === 'history'">
           <AuditTimeline resource-type="post" :resource-id="selectedPostForDetail.id" />
@@ -182,13 +172,6 @@
             class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5 disabled:opacity-50"
           >
             <Undo2 class="w-4 h-4" />Voltar para rascunho
-          </button>
-          <button
-            v-if="isAgencyOwner && !isFinalStatus"
-            @click="handleChangeWriter"
-            class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-1.5"
-          >
-            <UserCog class="w-4 h-4" />Trocar redator
           </button>
           <button
             v-if="isWriter"
@@ -224,13 +207,11 @@ import { useMediaCache } from '@/composables/useMediaCache'
 import { usePostDuplication } from '@/composables/usePostDuplication'
 import { useMediaViewer } from '@/composables/useMediaViewer'
 import StatusBadge from './StatusBadge.vue'
-import UserChip from './UserChip.vue'
+import PostPeopleTab from './PostPeopleTab.vue'
 import AuditTimeline from './AuditTimeline.vue'
 import MediaImage from './MediaImage.vue'
 import type { CommentItem, PostItem } from '@/types/api'
-import { X, FileText, MessageCircle, History, Send, Trash2, Undo2, Edit, UserCog, Copy } from '@lucide/vue'
-
-const emit = defineEmits<{ 'change-writer': [post: PostItem] }>()
+import { X, FileText, MessageCircle, History, Send, Trash2, Undo2, Edit, Copy, Users } from '@lucide/vue'
 
 const { confirmDialog } = useDialog()
 const { postDetailModalOpen, selectedPostForDetail, closePostDetailModal, openEditPostModal } = useModals()
@@ -240,7 +221,7 @@ const { getAvatarUrl, loadAvatar } = useMediaCache()
 const { duplicateAsDraft } = usePostDuplication()
 const { openMediaViewer } = useMediaViewer()
 
-const activeTab = ref<'content' | 'comments' | 'history'>('content')
+const activeTab = ref<'content' | 'people' | 'comments' | 'history'>('content')
 const newComment = ref('')
 const isChangingStatus = ref(false)
 
@@ -280,18 +261,16 @@ async function handleReturnToDraft() {
   }
 }
 
+// Troca de redator ou cliente na aba Redator & Cliente
+function onPeopleUpdated(post: PostItem) {
+  selectedPostForDetail.value = post
+}
+
 function handleEdit() {
   const post = selectedPostForDetail.value
   if (!post) return
   closePostDetailModal()
   openEditPostModal(post)
-}
-
-function handleChangeWriter() {
-  const post = selectedPostForDetail.value
-  if (!post) return
-  closePostDetailModal()
-  emit('change-writer', post)
 }
 
 watch(() => selectedPostForDetail.value?.id, (postId) => {
@@ -328,10 +307,6 @@ async function handleDeleteComment(commentId: string) {
 function canDeleteComment(cmt: CommentItem): boolean {
   if (!currentUser.value) return false
   return currentUser.value.type === 'agency' || currentUser.value.id === cmt.author_id
-}
-
-function recordedName(name: string | null | undefined, fallback: string): string {
-  return name ? `${name} (não vinculado)` : fallback
 }
 
 function formatDate(iso: string): string {
