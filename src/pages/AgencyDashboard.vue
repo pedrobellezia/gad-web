@@ -26,12 +26,6 @@
           <LayoutDashboard class="w-4 h-4" />Visão Geral
         </button>
         <button
-          @click="currentSection = 'posts'"
-          :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'posts' }]"
-        >
-          <FileText class="w-4 h-4" />Todos os Posts
-        </button>
-        <button
           @click="currentSection = 'medias'"
           :class="['nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition', { active: currentSection === 'medias' }]"
         >
@@ -71,51 +65,16 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div class="bg-surface-50 dark:bg-surface-800/85 p-5 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-card dark:shadow-card-dark hover:shadow-card-hover transition-all">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Total de Posts</span>
-              <div class="w-8 h-8 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 border border-brand-100 dark:border-brand-500/25 flex items-center justify-center">
-                <FileText class="w-4 h-4" />
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-surface-900 dark:text-surface-50">{{ posts.length }}</p>
-          </div>
-
-          <div class="bg-surface-50 dark:bg-surface-800/85 p-5 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-card dark:shadow-card-dark hover:shadow-card-hover transition-all">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-semibold text-amber-600 dark:text-amber-300 uppercase tracking-wider">Em Revisão</span>
-              <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-500/25 flex items-center justify-center">
-                <Clock class="w-4 h-4" />
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-amber-700 dark:text-amber-300">{{ countStatus('review') }}</p>
-          </div>
-
-          <div class="bg-surface-50 dark:bg-surface-800/85 p-5 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-card dark:shadow-card-dark hover:shadow-card-hover transition-all">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-semibold text-emerald-600 dark:text-mint-400 uppercase tracking-wider">Aprovados</span>
-              <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-mint-500/15 text-emerald-600 dark:text-mint-400 border border-emerald-200 dark:border-mint-500/25 flex items-center justify-center">
-                <CheckCircle2 class="w-4 h-4" />
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-emerald-700 dark:text-mint-300">{{ countStatus('approved') }}</p>
-          </div>
-
-          <div class="bg-surface-50 dark:bg-surface-800/85 p-5 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-card dark:shadow-card-dark hover:shadow-card-hover transition-all">
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wider">Membros</span>
-              <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-500/25 flex items-center justify-center">
-                <Users class="w-4 h-4" />
-              </div>
-            </div>
-            <p class="text-3xl font-bold text-surface-900 dark:text-surface-50">{{ clients.length + writers.length + designers.length }}</p>
-          </div>
-        </div>
+        <PostStatusSummary
+          class="mb-8"
+          :counts="statusCounts"
+          :active="activeFilter === 'all' ? null : activeFilter"
+          @select="selectStatus"
+        />
       </div>
 
       <!-- Section: Posts -->
-      <div v-if="currentSection === 'posts' || currentSection === 'overview'" class="fade-in mb-8">
+      <div v-if="currentSection === 'overview'" class="fade-in mb-8">
         <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
           <h2 class="text-lg font-bold text-surface-900 dark:text-surface-50">Lista de Publicações</h2>
           <div class="flex flex-wrap gap-1.5 bg-surface-50 dark:bg-surface-800/90 border border-surface-200 dark:border-surface-700/80 p-1 rounded-lg text-xs">
@@ -344,7 +303,7 @@
 
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
@@ -362,10 +321,12 @@ import { useTheme } from '@/composables/useTheme'
 import MediaImage from '@/components/MediaImage.vue'
 import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
 import { useMediaViewer } from '@/composables/useMediaViewer'
-import type { PostItem, MediaItem } from '@/types/api'
+import type { PostItem, MediaItem, PostStatus } from '@/types/api'
+import PostStatusSummary from '@/components/PostStatusSummary.vue'
+import { countByStatus } from '@/utils/postStatus'
 import {
-  LayoutDashboard, FileText, Image, Key, Users, Activity,
-  Plus, Edit, Trash2, Clock, CheckCircle2, Sun, Moon
+  LayoutDashboard, Image, Key, Users, Activity,
+  Plus, Edit, Trash2, Sun, Moon
 } from '@lucide/vue'
 
 const { confirmDialog, promptDialog } = useDialog()
@@ -400,8 +361,11 @@ onMounted(async () => {
   ])
 })
 
-function countStatus(st: string): number {
-  return posts.value.filter(p => p.status === st).length
+const statusCounts = computed(() => countByStatus(posts.value))
+
+// Clicar no card do status filtra a lista; clicar de novo volta para todos
+function selectStatus(status: PostStatus) {
+  setFilter(activeFilter.value === status ? 'all' : status)
 }
 
 async function sendToReview(post: PostItem) {

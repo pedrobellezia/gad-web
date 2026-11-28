@@ -3,13 +3,27 @@
     class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 overflow-hidden flex flex-col shadow-xs dark:shadow-card-dark hover:border-brand-300 dark:hover:border-brand-500/40 hover:shadow-card-hover transition cursor-pointer"
     @click="emit('open', post)"
   >
-    <!-- Quem está ligado ao post (cliente, ou redator no painel do cliente) -->
-    <div v-if="shownPerson !== undefined" class="px-3.5 py-2.5 border-b border-surface-200/80 dark:border-surface-700/80">
+    <!-- Quem está ligado ao post: cliente à esquerda, redator espelhado à direita -->
+    <div
+      v-if="post.client !== undefined || post.writer !== undefined"
+      class="px-3.5 py-2.5 border-b border-surface-200/80 dark:border-surface-700/80 flex items-center justify-between gap-3"
+    >
       <UserChip
-        :user="shownPerson"
-        :label="person === 'writer' ? 'Redator' : 'Cliente'"
-        :empty-text="personEmptyText"
+        v-if="post.client !== undefined"
+        class="flex-1"
+        :user="post.client"
+        label="Cliente"
+        :empty-text="emptyText(post.published_client_name, 'Sem cliente')"
         size="sm"
+      />
+      <UserChip
+        v-if="post.writer !== undefined"
+        class="flex-1 ml-auto"
+        :user="post.writer"
+        label="Redator"
+        :empty-text="emptyText(post.published_writer_name, 'Sem redator')"
+        size="sm"
+        reverse
       />
     </div>
 
@@ -64,22 +78,14 @@ import UserChip from './UserChip.vue'
 import type { PostItem } from '@/types/api'
 import { ImageOff, Layers, MessageCircle } from '@lucide/vue'
 
-const props = withDefaults(defineProps<{
-  post: PostItem
-  // Pessoa exibida no topo do card
-  person?: 'client' | 'writer'
-}>(), { person: 'client' })
+const props = defineProps<{ post: PostItem }>()
 const emit = defineEmits<{ open: [post: PostItem] }>()
 
-// undefined = API ainda sem o campo (não afirmar "Sem cliente"); null = realmente sem pessoa
-const shownPerson = computed(() => props.person === 'writer' ? props.post.writer : props.post.client)
-
-// Post publicado guarda o nome de quem era o cliente/redator, mesmo após desvínculo
-const personEmptyText = computed(() => {
-  const recorded = props.person === 'writer' ? props.post.published_writer_name : props.post.published_client_name
-  if (recorded) return `${recorded} (não vinculado)`
-  return props.person === 'writer' ? 'Sem redator' : 'Sem cliente'
-})
+// undefined = API ainda sem o campo (não afirmar "Sem cliente"); null = realmente sem pessoa.
+// Post publicado guarda o nome de quem era o cliente/redator, mesmo após desvínculo.
+function emptyText(recorded: string | null | undefined, fallback: string): string {
+  return recorded ? `${recorded} (não vinculado)` : fallback
+}
 
 const coverMedia = computed(() => {
   if (props.post.medias.length === 0) return null

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-2 min-w-0">
+  <div :class="['flex items-center gap-2 min-w-0', { 'flex-row-reverse text-right': reverse }]">
     <div
       :class="[
         'rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-300 flex items-center justify-center font-bold shrink-0 overflow-hidden border border-surface-200 dark:border-brand-500/30',
@@ -34,6 +34,8 @@ const props = withDefaults(defineProps<{
   // Texto quando não há usuário (ex.: post sem redator)
   emptyText?: string
   size?: 'sm' | 'md'
+  // Espelhado: foto à direita e texto alinhado à direita
+  reverse?: boolean
 }>(), {
   emptyText: 'Não definido',
   size: 'md'
