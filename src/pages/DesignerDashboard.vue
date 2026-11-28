@@ -25,9 +25,9 @@
             { active: currentSection === 'gallery' }]"
         >
           <Image class="w-4 h-4" />
-          <span>Minha Galeria</span>
-          <span v-if="medias.length" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-200/80 dark:bg-surface-800 text-surface-700 dark:text-surface-200 font-semibold">
-            {{ medias.length }}
+          <span>Galeria de Mídias</span>
+          <span v-if="myMedias.length" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-surface-200/80 dark:bg-surface-800 text-surface-700 dark:text-surface-200 font-semibold" title="Mídias enviadas por você">
+            {{ myMedias.length }}
           </span>
         </button>
 
@@ -59,7 +59,7 @@
       <div v-if="currentSection === 'gallery'" class="fade-in space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Minha Galeria de Mídias</h1>
+            <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Galeria de Mídias</h1>
             <p class="text-sm text-surface-500 dark:text-surface-400">Faça upload de fotos e vídeos para serem utilizados nos posts da agência</p>
           </div>
           <button
@@ -88,38 +88,45 @@
           </button>
         </div>
 
-        <!-- Medias Grid -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div
-            v-for="media in medias"
-            :key="media.id"
-            class="bg-surface-50 dark:bg-surface-800/85 rounded-xl border border-surface-200 dark:border-surface-700/80 overflow-hidden shadow-xs dark:shadow-card-dark hover:shadow-md transition flex flex-col group cursor-pointer"
-            @click="openMediaDetailModal(media)"
-          >
-            <div class="h-40 bg-surface-200/70 dark:bg-surface-900 flex items-center justify-center relative overflow-hidden">
-              <MediaImage :media-id="media.id" :alt="media.alias" :video="media.media_type === 'video'" />
-              <span class="absolute top-2 right-2 text-[10px] bg-surface-950/70 text-white px-2 py-0.5 rounded backdrop-blur-xs z-10">
-                {{ formatBytes(media.size_bytes) }}
-              </span>
-            </div>
-
-            <div class="p-4 flex-1 flex flex-col justify-between">
-              <div>
-                <h4 class="font-semibold text-surface-900 dark:text-surface-100 text-sm truncate mb-1" :title="media.alias">
-                  {{ media.alias }}
-                </h4>
-                <p class="text-xs text-surface-500 dark:text-surface-400 truncate">
-                  {{ media.filename }}
-                </p>
-              </div>
-
-              <div class="mt-4 pt-3 border-t border-surface-200/80 dark:border-surface-700/80 flex items-center justify-between text-xs text-surface-500 dark:text-surface-400">
-                <span class="text-[11px] font-medium text-brand-600 dark:text-brand-400">Ver detalhes & histórico</span>
-                <ChevronRight class="w-4 h-4 text-surface-400 group-hover:text-brand-500 transition" />
-              </div>
-            </div>
+        <!-- Mesma grade da biblioteca da agência; o designer edita só as próprias mídias -->
+        <template v-else>
+          <div class="flex gap-1 bg-surface-50 dark:bg-surface-800/90 border border-surface-200 dark:border-surface-700/80 p-1 rounded-lg text-xs w-fit">
+            <button
+              v-for="opt in ownerOptions"
+              :key="opt.value"
+              type="button"
+              @click="ownerFilter = opt.value"
+              :class="['px-2.5 py-1 rounded-md font-medium transition', ownerFilter === opt.value ? 'bg-brand-500 text-white' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100']"
+            >
+              {{ opt.label }} ({{ opt.value === 'mine' ? myMedias.length : medias.length }})
+            </button>
           </div>
-        </div>
+
+          <MediaLibraryGrid
+            :medias="visibleMedias"
+            :empty-text="ownerFilter === 'mine' ? 'Você ainda não enviou mídias.' : 'Nenhuma mídia enviada ainda para esta agência.'"
+          >
+            <template #actions="{ media }">
+              <button
+                v-if="isMine(media)"
+                type="button"
+                @click="openMediaDetailModal(media)"
+                class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1.5 shrink-0"
+              >
+                <Edit class="w-3.5 h-3.5" />Editar
+              </button>
+              <button
+                v-else
+                type="button"
+                @click="openMediaDetailModal(media)"
+                class="p-1.5 -mr-1 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition shrink-0"
+                title="Detalhes da mídia"
+              >
+                <Menu class="w-4 h-4" />
+              </button>
+            </template>
+          </MediaLibraryGrid>
+        </template>
       </div>
 
       <!-- Section: Vínculo com Agência -->
@@ -267,7 +274,7 @@
 
 <script setup lang="ts">
 import { useDialog } from '@/composables/useDialog'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useMedia } from '@/composables/useMedia'
 import { useModals } from '@/composables/useModals'
@@ -275,19 +282,19 @@ import { useToast } from '@/composables/useToast'
 import { useTheme } from '@/composables/useTheme'
 import { agencyApi } from '@/api/agency'
 import { meApi } from '@/api/me'
-import type { AgencyPublic } from '@/types/api'
+import type { AgencyPublic, MediaItem } from '@/types/api'
 import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
-import MediaImage from '@/components/MediaImage.vue'
-import { formatBytes } from '@/utils/format'
+import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import {
   Image,
   Building2,
   User,
   Upload,
-  ChevronRight,
+  Edit,
+  Menu,
   Key,
   Link as LinkIcon,
   Unlink,
@@ -298,6 +305,21 @@ import {
 const { confirmDialog } = useDialog()
 const { user, logout, fetchProfile } = useAuth()
 const { medias, isLoading: loadingMedias, fetchMedias } = useMedia()
+
+// A API lista a biblioteca inteira da agência; o designer edita só as próprias mídias
+type OwnerFilter = 'mine' | 'all'
+const ownerFilter = ref<OwnerFilter>('mine')
+const ownerOptions: { value: OwnerFilter; label: string }[] = [
+  { value: 'mine', label: 'Minhas mídias' },
+  { value: 'all', label: 'Todas da agência' }
+]
+
+function isMine(media: MediaItem): boolean {
+  return !!user.value && media.designer_id === user.value.id
+}
+
+const myMedias = computed(() => medias.value.filter(isMine))
+const visibleMedias = computed(() => (ownerFilter.value === 'mine' ? myMedias.value : medias.value))
 const { openUploadMediaModal, openMediaDetailModal, openChangePasswordModal } = useModals()
 const { showToast } = useToast()
 const { isDark, toggleTheme } = useTheme()
