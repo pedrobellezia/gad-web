@@ -234,7 +234,7 @@
             ]"
           >
             <code class="text-sm font-mono font-bold text-brand-600 dark:text-brand-300 mr-1">{{ t.token }}</code>
-            <span v-if="t.expires_at" class="text-[10px] text-surface-500 dark:text-surface-400 mr-1 whitespace-nowrap" :title="`Válido até ${formatTokenExpiry(t.expires_at)}`">{{ expiresInLabel(t.expires_at) }}</span>
+            <span v-if="t.expires_at" class="text-[10px] text-surface-500 dark:text-surface-400 mr-1 whitespace-nowrap" :title="`Válido até ${formatTokenExpiry(t.expires_at)}`">{{ expiresInLabel(t) }}</span>
             <button @click="copyToken(t.token)" class="p-1.5 rounded-md text-surface-500 hover:text-surface-800 hover:bg-surface-200/70 dark:text-surface-400 dark:hover:text-surface-100 dark:hover:bg-surface-700/70 transition" title="Copiar">
               <Copy class="w-3.5 h-3.5" />
             </button>
@@ -347,7 +347,7 @@ import { useTheme } from '@/composables/useTheme'
 import MediaImage from '@/components/MediaImage.vue'
 import AgencyActivityFeed from '@/components/AgencyActivityFeed.vue'
 import { useMediaViewer } from '@/composables/useMediaViewer'
-import type { PostItem, MediaItem, PostStatus } from '@/types/api'
+import type { PostItem, MediaItem, PostStatus, InviteTokenItem } from '@/types/api'
 import PostStatusSummary from '@/components/PostStatusSummary.vue'
 import { countByStatus } from '@/utils/postStatus'
 import {
@@ -477,9 +477,14 @@ async function handleGenerateToken() {
   }
 }
 
-// Tokens valem 7 dias: mostra quanto falta para vencer
-function expiresInLabel(iso: string): string {
-  const ms = new Date(iso).getTime() - Date.now()
+// Tokens valem 7 dias: mostra quanto falta para vencer.
+// O restante é limitado à validade do token: se o relógio do computador estiver
+// alguns segundos atrás do servidor, um token novo não aparece como "8 dias".
+function expiresInLabel(t: InviteTokenItem): string {
+  if (!t.expires_at) return ''
+  const expires = new Date(t.expires_at).getTime()
+  let ms = expires - Date.now()
+  if (t.created_at) ms = Math.min(ms, expires - new Date(t.created_at).getTime())
   if (ms <= 0) return 'vencido'
   const hours = Math.ceil(ms / 3_600_000)
   if (hours < 24) return `expira em ${hours}h`
