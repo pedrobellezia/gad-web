@@ -130,39 +130,13 @@
       </div>
 
       <!-- Section: Vínculo com Agência -->
-      <div v-else-if="currentSection === 'agency'" class="fade-in space-y-6 max-w-2xl">
+      <div v-else-if="currentSection === 'agency'" :class="['fade-in space-y-6', linkedAgency ? 'max-w-5xl' : 'max-w-2xl']">
         <div>
           <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-50">Vínculo com Agência</h1>
           <p class="text-sm text-surface-500 dark:text-surface-400">Gerencie a conexão da sua conta de Designer com uma agência cadastrada</p>
         </div>
 
-        <div v-if="linkedAgency" class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-500/15 text-brand-600 dark:text-brand-300 flex items-center justify-center">
-              <Building2 class="w-6 h-6" />
-            </div>
-            <div>
-              <span class="text-xs text-emerald-600 dark:text-mint-400 font-semibold tracking-wider uppercase block">Vinculado Atualmente</span>
-              <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100">{{ linkedAgency.user.name }}</h3>
-            </div>
-          </div>
-
-          <div class="bg-surface-100/80 dark:bg-surface-900/70 p-4 rounded-xl border border-surface-200 dark:border-surface-700/80 text-xs space-y-1 text-surface-600 dark:text-surface-300">
-            <p><strong class="text-surface-800 dark:text-surface-100">CNPJ:</strong> {{ linkedAgency.cnpj }}</p>
-            <p><strong class="text-surface-800 dark:text-surface-100">Status:</strong> Conta Ativa</p>
-          </div>
-
-          <div class="pt-2">
-            <button
-              @click="handleUnlink"
-              :disabled="unlinking"
-              class="btn-danger px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-            >
-              <Unlink class="w-4 h-4" />
-              <span>{{ unlinking ? 'Desvinculando...' : 'Desvincular Desta Agência' }}</span>
-            </button>
-          </div>
-        </div>
+        <LinkedAgencyOverview v-if="linkedAgency" :agency="linkedAgency" :show-clients="true" :unlinking="unlinking" @unlink="handleUnlink" />
 
         <div v-else class="bg-surface-50 dark:bg-surface-800/85 rounded-2xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xs dark:shadow-card-dark space-y-4">
           <div class="w-10 h-10 rounded-xl bg-surface-200/70 dark:bg-surface-700/70 text-surface-600 dark:text-surface-300 flex items-center justify-center">
@@ -285,6 +259,7 @@ import { meApi } from '@/api/me'
 import type { AgencyPublic, MediaItem } from '@/types/api'
 import UploadMediaModal from '@/components/UploadMediaModal.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
+import LinkedAgencyOverview from '@/components/LinkedAgencyOverview.vue'
 import MediaDetailModal from '@/components/MediaDetailModal.vue'
 import MediaLibraryGrid from '@/components/MediaLibraryGrid.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'

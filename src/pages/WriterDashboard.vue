@@ -182,22 +182,11 @@
         </MediaLibraryGrid>
       </div>
 
-      <div v-if="currentSection === 'agency'" class="fade-in max-w-xl">
+      <div v-if="currentSection === 'agency'" :class="['fade-in', linkedAgency ? 'max-w-5xl' : 'max-w-xl']">
         <h2 class="text-2xl font-bold text-surface-900 dark:text-surface-50 mb-2">Vínculo com Agência</h2>
         <p class="text-sm text-surface-500 dark:text-surface-400 mb-6">Redatores vinculados podem criar posts e acessar a biblioteca da agência</p>
 
-        <div v-if="linkedAgency" class="bg-surface-50 dark:bg-surface-800/85 p-6 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-xs dark:shadow-card-dark mb-6">
-          <div class="flex items-center justify-between gap-4">
-            <div>
-              <span class="text-xs font-semibold text-emerald-600 dark:text-mint-400 uppercase tracking-wider">Vinculado à Agência</span>
-              <h3 class="text-lg font-bold text-surface-900 dark:text-surface-100 mt-1">{{ linkedAgency.user.name }}</h3>
-              <p class="text-xs text-surface-500 dark:text-surface-400">CNPJ: {{ linkedAgency.cnpj }}</p>
-            </div>
-            <button @click="handleSelfUnlink" class="btn-danger px-4 py-2 rounded-lg text-xs font-medium shrink-0">
-              Desvincular-me
-            </button>
-          </div>
-        </div>
+        <LinkedAgencyOverview v-if="linkedAgency" :agency="linkedAgency" :show-clients="true" @unlink="handleSelfUnlink" />
 
         <div v-else class="bg-surface-50 dark:bg-surface-800/85 p-6 rounded-2xl border border-surface-200 dark:border-surface-700/80 shadow-xs dark:shadow-card-dark">
           <h3 class="text-base font-semibold text-surface-900 dark:text-surface-100 mb-2">Conectar a uma Agência</h3>
@@ -266,6 +255,7 @@ import { useDialog } from '@/composables/useDialog'
 import { ref, computed, onMounted } from 'vue'
 import PostCard from '@/components/PostCard.vue'
 import SidebarUserFooter from '@/components/SidebarUserFooter.vue'
+import LinkedAgencyOverview from '@/components/LinkedAgencyOverview.vue'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import CreatePostModal from '@/components/CreatePostModal.vue'
 import EditPostModal from '@/components/EditPostModal.vue'
